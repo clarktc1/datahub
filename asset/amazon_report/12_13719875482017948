@@ -1,0 +1,5 @@
+return-date	order-id	sku	asin	fnsku	product-name	quantity	fulfillment-center-id	detailed-disposition	reason	status	license-plate-number	customer-comments
+2019-02-20T15:18:27+00:00	112-1971173-6329865	NH-B00NLWAX9M	B00NLWAX9M	X002090HXP	Nockturnal Lighted Arrow Nock X Model 3/Pkg Green	1	LEX1	SELLABLE	ORDERED_WRONG_ITEM	Unit returned to inventory	LPNRR698849092	Weren't the correct size for my arrows.
+2019-02-10T05:05:52+00:00	112-0521851-5265017	NH-B00CJJFG9K	B00CJJFG9K	X001ZFAWMV	Warthog Classic II Stones Fine 1000	1	LEX1	SELLABLE	ORDERED_WRONG_ITEM	Unit returned to inventory	LPNRR698247068	
+2019-02-05T15:21:40+00:00	112-7298268-6952208	NH-B07DJZ4WTR	B07DJZ4WTR	X0020ECZEJ	ProMag Sig Sauer P938 9mm (10) Rd Blue Steel	1	IND8	DEFECTIVE	DEFECTIVE	Unit returned to inventory	LPNN210643733	doesn't hold or dispense ammo properly
+2019-02-05T06:32:26+00:00	111-7100802-2233063	NH-B004YTL2P0	B004YTL2P0	X0020AU9D7	Graham Bros. Folding Razel, Micarta Handle, Plain	1	IND8	DEFECTIVE	DEFECTIVE	Unit returned to inventory	LPNN250329836	The locking mechanism doesn't work which is extremely dangerous because it's a knife.
