@@ -21,7 +21,7 @@ class Process_finance_api extends CI_Model
         }
         $this->db->join('seller_country_mapping','seller_country_mapping.seller_id = amazon_profile.profile_id','inner');
         $this->db->where('seller_country_mapping.status',1);
-        $this->db->where('profile_id != 1');
+        // $this->db->where('profile_id != 1');
         $this->db->order_by('profile_id','ASC');
         $query = $this->db->get();
         return $query->result_array();
