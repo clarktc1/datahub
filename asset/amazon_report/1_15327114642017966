@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<ErrorResponse xmlns="http://mws.amazonaws.com/doc/2009-01-01/">
-  <Error>
-    <Type></Type>
-    <Code>RequestThrottled</Code>
-    <Message>Request is throttled</Message>
-  </Error>
-  <RequestID>69f87214-c45a-4a52-ac92-2588b113a22e</RequestID>
-</ErrorResponse>

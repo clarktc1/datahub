@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<ErrorResponse xmlns="http://mws.amazonaws.com/doc/2009-01-01/">
-  <Error>
-    <Type></Type>
-    <Code>QuotaExceeded</Code>
-    <Message>You exceeded your quota of 60.0 requests per 1 hour for operation Reports/2009-01-01/GetReport.  Your quota will reset on Mon Feb 11 15:51:00 UTC 2019</Message>
-  </Error>
-  <RequestID>76229987-ce04-4dee-9d25-4471232dd07c</RequestID>
-</ErrorResponse>
