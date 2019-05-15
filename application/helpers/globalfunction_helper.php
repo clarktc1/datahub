@@ -5,21 +5,21 @@ if (!defined('BASEPATH'))
 
 if (!function_exists('sendEmails')) {
     function sendEmails($emailData) {
-        $config = Array(
+        /*$config = Array(
                             'mailtype' => 'html',
                             'wordwrap' => TRUE,
                             'charset' => 'iso-8859-1',
-                        );
+                        );*/
 
         //SMTP & mail configuration
         $config = array(
-                            'protocol' => 'smtp',
+                            'protocol'  => 'smtp',
                             'smtp_host' => 'ssl://smtp.googlemail.com',
                             'smtp_port' => 465,
                             'smtp_user' => 'ritika1wayit@gmail.com',
                             'smtp_pass' => 'Ritika@123',
-                            'mailtype' => 'html',
-                            'charset' => 'utf-8'
+                            'mailtype'  => 'html',
+                            'charset'   => 'iso-8859-1'
                         );
 
         $ci = & get_instance();
@@ -30,7 +30,7 @@ if (!function_exists('sendEmails')) {
         if (!empty($emailData['from'])) {
             $fromEmail = $emailData['from'];
         } else {
-            $fromEmail = "admin@tcc.com";
+            $fromEmail = "no-reply@tcc.com";
         }
 
         $ci->email->from($fromEmail, 'Tcc Admin');

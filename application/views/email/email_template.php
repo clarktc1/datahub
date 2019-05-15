@@ -5,9 +5,6 @@
 				<table xss=removed border="0" width="600" cellspacing="0" cellpadding="0" align="center">
 					<tbody>
 						<tr>
-							<td xss=removed align="center" valign="middle" height="100">LOGO</td>
-						</tr>
-						<tr>
 							<td>
 								<table width="100%" cellspacing="0" cellpadding="0">
 									<tbody>
@@ -18,6 +15,10 @@
 													<tbody>
 														<tr>
 															<td height="15"> </td>
+														</tr>														
+														<tr>
+															<td xss=removed height="15">
+															</td>
 														</tr>
 														<tr>
 															<td width="530">
@@ -28,7 +29,7 @@
 																				<table border="0" width="100%" cellspacing="0" cellpadding="0">
 																					<tbody>
 																						<tr>
-																							<td xss=removed align="left" valign="middle" height="30"><strong>Dear FIRSTNAME LASTNAME,</strong></td>
+																							<td xss=removed align="left" valign="middle" height="30"><strong>Hello,</strong></td>
 																						</tr>
 																						<tr>
 																							<td xss=removed align="left" valign="top">
@@ -36,7 +37,7 @@
 																							</td>
 																						</tr>
 																						<tr>
-																							<td xss=removed align="left" valign="top">Regards,<br> SITE_TITLE Team</td>
+																							<td xss=removed align="left" valign="top">Regards,<br> Tcc Team</td>
 																						</tr>
 																					</tbody>
 																				</table>
@@ -44,11 +45,6 @@
 																		</tr>
 																	</tbody>
 																</table>
-															</td>
-														</tr>
-														<tr>
-															<td xss=removed height="15">
-																<p>*This email account is not monitored. Please do not reply to this email as we will not be able to read and respond to your messages.</p>
 															</td>
 														</tr>
 													</tbody>
@@ -63,7 +59,7 @@
 						<tr>
 							<td xss=removed align="center" valign="top">
 								<p>You have received this message by auto generated e-mail.</p>
-								<center>COPY_RIGHT_TEXT</center>
+								<center>Copyright © <?php echo date('Y'); ?></center>
 							</td>
 						</tr>
 					</tbody>

@@ -323,16 +323,16 @@ class Finance_api extends CI_Controller
             }
             $error_msg_html = "";
             foreach ($error_msg_array as $error_key => $error_msgs) {
-                $error_msg_html .= "User ID => ".$error_key."<br>";
+                $error_msg_html .= "User ID => ".$error_key."<br><br>";
                 foreach ($error_msgs as $error_msg) {
-                    $error_msg_html .= "Error Msg => ".$error_msg."<br>";
+                    $error_msg_html .= "Error Msg => ".$error_msg."<br><br>";
                 }
-                $error_msg_html .= "<br><br>";
+                $error_msg_html .= "<br><br><br>";
             }
             $error_view_array['error_msg_html'] = $error_msg_html;
             $emailData =  array();
             $emailData['to'] = "sunil@1wayit.com";
-            $emailData['subject'] = "Test Email Subject Data for view";
+            $emailData['subject'] = "DataHub Error";
             $emailData['message'] = $this->load->view('email/email_template',$error_view_array,true);
             $checkEmail = sendEmails($emailData);
             if ($checkEmail) {
