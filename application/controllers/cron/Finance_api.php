@@ -294,9 +294,11 @@ class Finance_api extends CI_Controller
                             $this->updatedata('finance_order_data', $finance_order_data_update, array('id' => $finance_order_data["id"]));
                         }
                     } else {
-                        $checkInsert = $this->insertdata('finance_order_data_summary',$finance_order_data_summary_array);
-                        if ($checkInsert==1) {
-                            $this->updatedata('finance_order_data', $finance_order_data_update, array('id' => $finance_order_data["id"]));
+                        if (!$get_finance_order_data_summary) {
+                            $checkInsert = $this->insertdata('finance_order_data_summary',$finance_order_data_summary_array);
+                            if ($checkInsert==1) {
+                                $this->updatedata('finance_order_data', $finance_order_data_update, array('id' => $finance_order_data["id"]));
+                            }
                         }
                     }
                 }
