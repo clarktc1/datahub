@@ -21,7 +21,7 @@ class Process_finance_api extends CI_Model
         }
         $this->db->join('seller_country_mapping','seller_country_mapping.seller_id = amazon_profile.profile_id','inner');
         $this->db->where('seller_country_mapping.status',1);
-        $this->db->where('profile_id != 1');
+        // $this->db->where('profile_id != 1');
         $this->db->order_by('profile_id','ASC');
         $query = $this->db->get();
         return $query->result_array();
@@ -1172,8 +1172,11 @@ class Process_finance_api extends CI_Model
         $this->db->from('finance_order_data');
         $this->db->where('finance_order_data_summary','n');
         $query = $this->db->get();
-        return $query->result_array();
-
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
     }
 
     function get_finance_order_item_data($data)
@@ -1185,8 +1188,11 @@ class Process_finance_api extends CI_Model
         $this->db->where('dev_date',$data['dev_date']);
         $this->db->where('added_by',$data['added_by']);
         $query = $this->db->get();
-        return $query->result_array();
-
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
     }
 
     function get_finance_order_item_charge_list_data($data)
@@ -1198,7 +1204,11 @@ class Process_finance_api extends CI_Model
         $this->db->where('item_dev_ref',$data['item_dev_ref']);
         $this->db->where('dev_date',$data['dev_date']);
         $query = $this->db->get();
-        return $query->result_array();
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
 
     }
 
@@ -1211,8 +1221,11 @@ class Process_finance_api extends CI_Model
         $this->db->where('item_dev_ref',$data['item_dev_ref']);
         $this->db->where('dev_date',$data['dev_date']);
         $query = $this->db->get();
-        return $query->result_array();
-
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
     }
 
     function get_finance_order_item_promotion_list_data($data)
@@ -1224,8 +1237,11 @@ class Process_finance_api extends CI_Model
         $this->db->where('item_dev_ref',$data['item_dev_ref']);
         $this->db->where('dev_date',$data['dev_date']);
         $query = $this->db->get();
-        return $query->result_array();
-
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
     }
 
     function get_finance_order_item_tax_withheld_list_data($data)
@@ -1237,8 +1253,11 @@ class Process_finance_api extends CI_Model
         $this->db->where('item_dev_ref',$data['item_dev_ref']);
         $this->db->where('dev_date',$data['dev_date']);
         $query = $this->db->get();
-        return $query->result_array();
-
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
     }
 
     function get_finance_order_data_summary($data,$getRespose = null)
@@ -1249,10 +1268,14 @@ class Process_finance_api extends CI_Model
         $this->db->where('added_by',$data['added_by']);
         $this->db->where('dev_date',$data['dev_date']);
         $query = $this->db->get();
-        if ($getRespose=="All")
-            return $query->result_array();
-        else
-            return $query->row();
+        if ($query->num_rows() > 0) {
+            if ($getRespose=="All")
+                return $query->result_array();
+            else
+                return $query->row();
+        } else {
+            return false;
+        }
     }
 }
 ?>
