@@ -453,6 +453,7 @@ class Process_finance_api extends CI_Model
                 foreach ($getRefundEventList as $getRefundEvent) {
                     date_default_timezone_set('UTC');
                     $get_posted_date = (string) $getRefundEvent->PostedDate;
+                    $marketplaceName = (string) $getRefundEvent->MarketplaceName;
                     /*$searchData  = array('T','Z');
                     $replaceData = array(' ','');
                     $changeData  = str_replace($searchData, $replaceData,$get_posted_date);
@@ -460,9 +461,32 @@ class Process_finance_api extends CI_Model
                     $dateTime = new DateTime ($get_posted_date);
                     $dateTime->setTimezone(new DateTimeZone('America/Los_Angeles'));
                     $posted_date = $dateTime->format('Y-m-d H:i:s');
+
+                    if (trim($marketplaceName)=="Amazon.co.uk") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/London'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.de") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Berlin'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.es") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Madrid'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.fr") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Paris'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.it") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Rome'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    }
+
                     $refundEventListData[$refundI]['amazonorderid']   = (string) $getRefundEvent->AmazonOrderId;
                     $refundEventListData[$refundI]['posteddate']      = $posted_date;
-                    $refundEventListData[$refundI]['marketplacename'] = (string) $getRefundEvent->MarketplaceName;
+                    $refundEventListData[$refundI]['marketplacename'] = $marketplaceName;
                     $refundEventListData[$refundI]['sellerorderid']   = (string) $getRefundEvent->SellerOrderId;
                     $refundEventListData[$refundI]['orderadjustmentitemid'] = (string) $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->OrderAdjustmentItemId;
                     $refundEventListData[$refundI]['quantityshipped']       = (string) $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->QuantityShipped;
@@ -576,6 +600,7 @@ class Process_finance_api extends CI_Model
                     }
 
                     $get_posted_date = (string) $getRefundEventList->PostedDate;
+                    $marketplaceName = (string) $getRefundEventList->MarketplaceName;
                     date_default_timezone_set('UTC');
                     /*$searchData  = array('T','Z');
                     $replaceData = array(' ','');
@@ -584,9 +609,32 @@ class Process_finance_api extends CI_Model
                     $dateTime = new DateTime ($get_posted_date);
                     $dateTime->setTimezone(new DateTimeZone('America/Los_Angeles'));
                     $posted_date = $dateTime->format('Y-m-d H:i:s');
+
+                    if (trim($marketplaceName)=="Amazon.co.uk") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/London'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.de") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Berlin'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.es") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Madrid'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.fr") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Paris'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.it") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Rome'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    }
+
                     $refundEventListData[0]['amazonorderid']   = (string) $getRefundEventList->AmazonOrderId;
                     $refundEventListData[0]['posteddate']      = $posted_date;
-                    $refundEventListData[0]['marketplacename'] = (string) $getRefundEventList->MarketplaceName;
+                    $refundEventListData[0]['marketplacename'] = $marketplaceName;
                     $refundEventListData[0]['sellerorderid']   = (string) $getRefundEventList->SellerOrderId;
                     $refundEventListData[0]['orderadjustmentitemid'] = (string) $getRefundEventList->ShipmentItemAdjustmentList->ShipmentItem->OrderAdjustmentItemId;
                     $refundEventListData[0]['quantityshipped']       = (string) $getRefundEventList->ShipmentItemAdjustmentList->ShipmentItem->QuantityShipped;
@@ -719,6 +767,7 @@ class Process_finance_api extends CI_Model
                     $dev_ref = $this->generate_random_strings();
                     $dev_ref = $dev_ref.time();
                     $get_posted_date = (string) $ShipmentEvent->PostedDate;
+                    $marketplaceName = (string) $ShipmentEvent->MarketplaceName;
                     /*$searchData  = array('T','Z');
                     $replaceData = array(' ','');
                     $changeData  = str_replace($searchData, $replaceData,$get_posted_date);
@@ -726,6 +775,28 @@ class Process_finance_api extends CI_Model
                     $dateTime = new DateTime ($get_posted_date);
                     $dateTime->setTimezone(new DateTimeZone('America/Los_Angeles'));
                     $posted_date = $dateTime->format('Y-m-d H:i:s');
+
+                    if (trim($marketplaceName)=="Amazon.co.uk") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/London'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.de") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Berlin'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.es") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Madrid'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.fr") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Paris'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.it") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Rome'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    }
 
                     $dateTimeGmt = new DateTime ($get_posted_date);
                     $dateTimeGmt->setTimezone(new DateTimeZone('GMT'));
@@ -740,7 +811,7 @@ class Process_finance_api extends CI_Model
                     $payload[$i]['posted_date']     = $posted_date;
                     $payload[$i]['posted_date_gmt'] = $posted_date_gmt;
                     $payload[$i]['posted_date_pst'] = $posted_date_pst;
-                    $payload[$i]['market_place']    = (string) $ShipmentEvent->MarketplaceName;
+                    $payload[$i]['market_place']    = $marketplaceName;
                     $payload[$i]['seller_order_id'] = (string) $ShipmentEvent->SellerOrderId;
                     $payload[$i]['dev_ref']         = $dev_ref;
                     $payload[$i]['dev_date']        = $get_posted_date;
