@@ -778,7 +778,8 @@ class Process_finance_api extends CI_Model
 
                     if (trim($marketplaceName)=="Amazon.co.uk") {
                         $dateTime = new DateTime ($get_posted_date);
-                        $dateTime->setTimezone(new DateTimeZone('Europe/London'));
+                        // $dateTime->setTimezone(new DateTimeZone('Europe/London'));
+                        $dateTime->setTimezone(new DateTimeZone('GMT'));
                         $posted_date = $dateTime->format('Y-m-d H:i:s');
                     } elseif (trim($marketplaceName)=="Amazon.de") {
                         $dateTime = new DateTime ($get_posted_date);
