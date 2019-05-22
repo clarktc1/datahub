@@ -72,11 +72,6 @@ class Process_report_model extends CI_Model
       $sql.=" AND user_id=".$this->db->escape($user_id);
     }      
     $sql.="INNER JOIN supported_country AS spt ON spt.amz_code=fed.market_id ";
-
-    // remove after create code
-    $sql.=" WHERE request_type ='_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_'";
-    // remove after create code
-
     $query=$this->db->query($sql);
     return $query->result_array();       
   }
