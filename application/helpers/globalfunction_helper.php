@@ -89,23 +89,23 @@ if (!function_exists('getTimeZoneDateTime')) {
         $dateTime->setTimezone(new DateTimeZone('America/Los_Angeles'));
         $posted_date = $dateTime->format('Y-m-d H:i:s');
 
-        if (trim($marketplaceName)=="Amazon.co.uk") {
+        if (trim($marketplaceName)=="Amazon.co.uk" || trim($marketplaceName)=="SI UK Prod Marketplace") {
             $dateTime = new DateTime ($get_posted_date);
             $dateTime->setTimezone(new DateTimeZone('GMT'));
             $posted_date = $dateTime->format('Y-m-d H:i:s');
-        } elseif (trim($marketplaceName)=="Amazon.de") {
+        } elseif (trim($marketplaceName)=="Amazon.de" || trim($marketplaceName)=="SI DE Prod Marketplace") {
             $dateTime = new DateTime ($get_posted_date);
             $dateTime->setTimezone(new DateTimeZone('Europe/Berlin'));
             $posted_date = $dateTime->format('Y-m-d H:i:s');
-        } elseif (trim($marketplaceName)=="Amazon.es") {
+        } elseif (trim($marketplaceName)=="Amazon.es" || trim($marketplaceName)=="SI ES Prod Marketplace") {
             $dateTime = new DateTime ($get_posted_date);
             $dateTime->setTimezone(new DateTimeZone('Europe/Madrid'));
             $posted_date = $dateTime->format('Y-m-d H:i:s');
-        } elseif (trim($marketplaceName)=="Amazon.fr") {
+        } elseif (trim($marketplaceName)=="Amazon.fr" || trim($marketplaceName)=="SI FR Prod Marketplace") {
             $dateTime = new DateTime ($get_posted_date);
             $dateTime->setTimezone(new DateTimeZone('Europe/Paris'));
             $posted_date = $dateTime->format('Y-m-d H:i:s');
-        } elseif (trim($marketplaceName)=="Amazon.it") {
+        } elseif (trim($marketplaceName)=="Amazon.it" || trim($marketplaceName)=="SI It Prod Marketplace") {
             $dateTime = new DateTime ($get_posted_date);
             $dateTime->setTimezone(new DateTimeZone('Europe/Rome'));
             $posted_date = $dateTime->format('Y-m-d H:i:s');
