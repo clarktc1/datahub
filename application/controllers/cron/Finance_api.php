@@ -331,7 +331,7 @@ class Finance_api extends CI_Controller
             }
             $error_view_array['error_msg_html'] = $error_msg_html;
             $emailData =  array();
-            $emailData['to'] = "sunil@1wayit.com";
+            $emailData['to'] = "support@magicdatamachine.com";
             $emailData['subject'] = "DataHub Error";
             $emailData['message'] = $this->load->view('email/email_template',$error_view_array,true);
             $checkEmail = sendEmails($emailData);

@@ -85,95 +85,124 @@ class Report_api extends CI_Controller
 
     public function get_report($request_id='NULL',$user_id='')
     {
-        echo "Cron triggered on :".date('Y-m-d H:i:s')."\n";
-        $users=$this->report_api->get_seller_who_have_generated_report($request_id,$user_id);
+        echo "<pre>";
+        echo "Cron triggered on :".date('Y-m-d H:i:s')."\n";        
         //die();
-        if(count($users) > 0)
-        {
-            foreach($users as $usr)
+        try {
+            $users=$this->report_api->get_seller_who_have_generated_report($request_id,$user_id);
+            if(count($users) > 0)
             {
-                // print_r($usr['country_code']);
-                // die();
-                $this->report_api->set_credentials($usr);
-                $res=$this->report_api->get_report($usr);
-
-                if(is_file($res['report_file']))
+                foreach($users as $usr)
                 {
-                    $this->load->model('new_cron/report_file_process','report_process');
+                    // print_r($usr);
+                    // die();
+                    $this->report_api->set_credentials($usr);
+                    $res=$this->report_api->get_report($usr);
 
-                    if($usr['request_type']=='_GET_AMAZON_FULFILLED_SHIPMENTS_DATA_')
+                    // $res = array(
+                    //                 "status_code" => 1,
+                    //                 "status_text" => "Success",
+                    //                 "report_file" => "/var/www/html/datahub/asset/amazon_report/1_15780073840018000",
+                    //             );
+
+                    if(is_file($res['report_file']))
                     {
-                        $this->report_process->process_fba_shipments_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        $this->load->model('new_cron/report_file_process','report_process');
+
+                        if($usr['request_type']=='_GET_AMAZON_FULFILLED_SHIPMENTS_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_fba_shipments_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_')
+                        {
+                            $checkDataSave = $this->report_process->process_order_update_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_')
+                        {
+                            $checkDataSave = $this->report_process->process_order_data_by_date($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_SALES_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_fba_fulfill_ship_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FLAT_FILE_ACTIONABLE_ORDER_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_actionable_order_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FLAT_FILE_ORDERS_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_flat_order_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_CONVERGED_FLAT_FILE_ORDER_REPORT_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_converged_order_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_fba_returns_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_RESTOCK_INVENTORY_RECOMMENDATIONS_REPORT_')
+                        {
+                            $checkDataSave = $this->report_process->process_restock_inv_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_INVENTORY_HEALTH_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_fba_inv_health_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_STRANDED_INVENTORY_UI_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_stranded_inv_ui_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FBA_STORAGE_FEE_CHARGES_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_fba_storage_fee_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_REPLACEMENT_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_fba_shipment_replacement_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_FBA_ESTIMATED_FBA_FEES_TXT_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_fba_estimated_fees_txt_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_MERCHANT_LISTINGS_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_inventory_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        elseif($usr['request_type']=='_GET_MERCHANT_LISTINGS_INACTIVE_DATA_')
+                        {
+                            $checkDataSave = $this->report_process->process_inactive_inventory_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                        }
+                        else
+                        {
+                            $this->report_process->process_report_data_for_testing($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);    
+                        }
+                        // print_r($checkDataSave);
+                        if (isset($checkDataSave) && $checkDataSave['response'] == 1) {
+                            $this->report_process->update_report_feed_log($usr['profile_id'],$usr['req_id']);
+                        }
+                        if (isset($checkDataSave) && $checkDataSave['response'] == 2) {
+                            $mwsNewDataLog = array();
+                            $mwsNewDataLog['table_name'] = $checkDataSave['table_name'];
+                            $mwsNewDataLog['user_id']    = $usr['profile_id'];
+                            $mwsNewDataLog['data']       = json_encode($checkDataSave);
+                            insertdata('mws_new_data_log',$mwsNewDataLog);
+                        }
+                        // die("one record");
+                        // if (!isset($checkDataSave)) {
+                        //     $this->report_process->update_report_feed_log($usr['profile_id'],$usr['req_id']);
+                        // }
+                        // $this->report_process->update_report_feed_log($usr['profile_id'],$usr['req_id']);
                     }
-                    elseif($usr['request_type']=='_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_')
-                    {
-                        $this->report_process->process_order_update_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_')
-                    {
-                        $this->report_process->process_order_data_by_date($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_SALES_DATA_')
-                    {
-                        $this->report_process->process_fba_fulfill_ship_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FLAT_FILE_ACTIONABLE_ORDER_DATA_')
-                    {
-                        $this->report_process->process_actionable_order_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FLAT_FILE_ORDERS_DATA_')
-                    {
-                        $this->report_process->process_flat_order_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_CONVERGED_FLAT_FILE_ORDER_REPORT_DATA_')
-                    {
-                        $this->report_process->process_converged_order_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_')
-                    {
-                        $this->report_process->process_fba_returns_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_RESTOCK_INVENTORY_RECOMMENDATIONS_REPORT_')
-                    {
-                        $this->report_process->process_restock_inv_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_INVENTORY_HEALTH_DATA_')
-                    {
-                        $this->report_process->process_fba_inv_health_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_STRANDED_INVENTORY_UI_DATA_')
-                    {
-                        $this->report_process->process_stranded_inv_ui_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FBA_STORAGE_FEE_CHARGES_DATA_')
-                    {
-                        $this->report_process->process_fba_storage_fee_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_REPLACEMENT_DATA_')
-                    {
-                        $this->report_process->process_fba_shipment_replacement_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_FBA_ESTIMATED_FBA_FEES_TXT_DATA_')
-                    {
-                        $this->report_process->process_fba_estimated_fees_txt_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_MERCHANT_LISTINGS_DATA_')
-                    {
-                        $this->report_process->process_inventory_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    elseif($usr['request_type']=='_GET_MERCHANT_LISTINGS_INACTIVE_DATA_')
-                    {
-                        $this->report_process->process_inactive_inventory_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
-                    }
-                    else
-                    {
-                        $this->report_process->process_report_data_for_testing($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);    
-                    }
-                    $this->report_process->update_report_feed_log($usr['profile_id'],$usr['req_id']);
                 }
             }
+            echo "Cron completed on :".date('Y-m-d H:i:s')."\n";
+        } catch(Exception $e) {
+            $mwsNewDataLog = array();
+            $mwsNewDataLog['table_name'] = "Error on get_report function (application/controllers/cron/Report_api.php)";
+            $mwsNewDataLog['data']       = $e->getMessage();
+            insertdata('mws_new_data_log',$mwsNewDataLog);
         }
-        echo "Cron completed on :".date('Y-m-d H:i:s')."\n";
     }
 
     public function test_process()
