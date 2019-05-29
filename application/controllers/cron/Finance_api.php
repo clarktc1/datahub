@@ -103,6 +103,7 @@ class Finance_api extends CI_Controller
                     $this->insertdata('finance_service_fee_event_list',$serviceFeeEventListValue);
                 }
             }
+            $checkGetErrorLog = $res['payload']['mwsNewDataLog'];
             unset($res['payload']['mwsNewDataLog']);
             unset($res['payload']['ServiceFeeEventList']);
             unset($res['payload']['RefundEventList']);
@@ -173,13 +174,15 @@ class Finance_api extends CI_Controller
                 $this->finance_order_data_summary();
             } else {
                 if (isset($res['payload']) && empty($res['payload'][0])) {
-                    $mwsNewDataLogEmpty = array();
-                    $mwsNewDataLogEmpty['table_name'] = "No Data Found";
-                    $mwsNewDataLogEmpty['user_id']    = $usr['profile_id'];
-                    $mwsNewDataLogEmpty['data']       = $res['startDate']." to ".$res['createDate'];
-                    $mwsNewDataLogEmpty['api_date']   = $res['createDate'];
-                    $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
-                    $this->updatedata('finance_data_log',['date' => $res['createDate'] ], ['user_id' => $usr['profile_id'] ] );
+                    if (empty($checkGetErrorLog)) {
+                        $mwsNewDataLogEmpty = array();
+                        $mwsNewDataLogEmpty['table_name'] = "No Data Found";
+                        $mwsNewDataLogEmpty['user_id']    = $usr['profile_id'];
+                        $mwsNewDataLogEmpty['data']       = $res['startDate']." to ".$res['createDate'];
+                        $mwsNewDataLogEmpty['api_date']   = $res['createDate'];
+                        $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
+                        $this->updatedata('finance_data_log',['date' => $res['createDate'] ], ['user_id' => $usr['profile_id'] ] );
+                    }
                 }
             }
             if (isset($res['tokens'])) {
