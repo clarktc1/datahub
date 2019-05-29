@@ -113,3 +113,44 @@ if (!function_exists('getTimeZoneDateTime')) {
         return $posted_date;
     }
 }
+
+if (!function_exists('send_error_mail')) {
+    function send_error_mail()
+    {
+        $ci = & get_instance();
+        $ci->db->select('*');
+        $ci->db->from('mws_new_data_log');
+        $ci->db->where('sent_mail','n');
+        $query = $ci->db->get();
+        $get_all_error = $query->result_array();
+        if (!empty($get_all_error)) {
+            $error_view_array = array();
+            $error_msg_array = array();
+            $error_status_array = array();
+            foreach ($get_all_error as $get_error) {
+                $error_msg_array[$get_error['user_id']][] = $get_error['data'];
+                $error_status_array[] = $get_error['id'];
+            }
+            $error_msg_html = "";
+            foreach ($error_msg_array as $error_key => $error_msgs) {
+                $error_msg_html .= "User ID => ".$error_key."<br><br>";
+                foreach ($error_msgs as $error_msg) {
+                    $error_msg_html .= "Error Msg => ".$error_msg."<br><br>";
+                }
+                $error_msg_html .= "<br><br><br>";
+            }
+            $error_view_array['error_msg_html'] = $error_msg_html;
+            $emailData =  array();
+            $emailData['to'] = "sunil@1wayit.com";
+            $emailData['subject'] = "DataHub Error helper";
+            $emailData['message'] = $ci->load->view('email/email_template',$error_view_array,true);
+            $checkEmail = sendEmails($emailData);
+            if ($checkEmail) {
+                $changeStatus = array();
+                $changeStatus['sent_mail'] = "y";
+                $ci->db->where_in('id', $error_status_array);
+                $ci->db->update('mws_new_data_log',$changeStatus);
+            }
+        }
+    }
+}

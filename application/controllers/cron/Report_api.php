@@ -197,11 +197,13 @@ class Report_api extends CI_Controller
                 }
             }
             echo "Cron completed on :".date('Y-m-d H:i:s')."\n";
+            send_error_mail();
         } catch(Exception $e) {
             $mwsNewDataLog = array();
             $mwsNewDataLog['table_name'] = "Error on get_report function (application/controllers/cron/Report_api.php)";
             $mwsNewDataLog['data']       = $e->getMessage();
             insertdata('mws_new_data_log',$mwsNewDataLog);
+            send_error_mail();
         }
     }
 
