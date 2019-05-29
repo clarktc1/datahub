@@ -141,8 +141,8 @@ if (!function_exists('send_error_mail')) {
             }
             $error_view_array['error_msg_html'] = $error_msg_html;
             $emailData =  array();
-            $emailData['to'] = "sunil@1wayit.com";
-            $emailData['subject'] = "DataHub Error helper rahul pc";
+            $emailData['to'] = "support@magicdatamachine.com";
+            $emailData['subject'] = "DataHub Error";
             $emailData['message'] = $ci->load->view('email/email_template',$error_view_array,true);
             $checkEmail = sendEmails($emailData);
             if ($checkEmail) {
