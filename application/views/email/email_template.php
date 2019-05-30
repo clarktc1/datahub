@@ -36,7 +36,7 @@ $base_url=base_url();
 																						</tr>
 																						<tr>
 																							<td xss=removed align="left" valign="top">
-																								<a href="<?= $base_url; ?>api-error-log">Click here</a> to show api error log in details.
+																								<a href="<?= $base_url; ?>api-error-log">Click here</a> to see api error log in details.
 																							</td>
 																						</tr>
 																						<tr>
