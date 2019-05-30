@@ -7,8 +7,8 @@ $base_url=base_url();
         <title>Api Error Logs</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="<?php echo $base_url.'/asset/css2/bootstrap.min.css';?>" rel="stylesheet">
-        <script src="<?php echo $base_url.'/asset/js2/bootstrap.min.js'?>"></script>
+        <link href="<?php echo $base_url.'asset/css2/bootstrap.min.css';?>" rel="stylesheet">
+        <script src="<?php echo $base_url.'asset/js2/bootstrap.min.js'?>"></script>
         <style type="text/css">
         	tr th { min-width: 125px; }
         </style>
