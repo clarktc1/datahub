@@ -34,7 +34,7 @@ class Finance_api extends CI_Controller
     public function product_match($user_id='')
     {
         // die("hello dsfsdfds dsfds");
-        /*$users=$this->product_api->get_seller_for_process();
+        $users=$this->product_api->get_seller_for_process();
         // echo "<pre>";
         // print_r($users);
         // die();
@@ -54,7 +54,7 @@ class Finance_api extends CI_Controller
                 // echo "<prE>"; print_r($responseArray); die();
             }
         }
-        $this->rerun_finace_empty();*/
+        $this->rerun_finace_empty();
         send_error_mail();
     }
 
