@@ -1,3 +1,6 @@
+<?php
+$base_url=base_url();
+?>
 <table border="0" width="100%">
 	<tbody>
 		<tr>
@@ -33,8 +36,11 @@
 																						</tr>
 																						<tr>
 																							<td xss=removed align="left" valign="top">
-																								<?php echo $error_msg_html; ?>
+																								<a href="<?= $base_url; ?>api-error-log">Click here</a> to show api error log in details.
 																							</td>
+																						</tr>
+																						<tr>
+																							<td height="30"></td>
 																						</tr>
 																						<tr>
 																							<td xss=removed align="left" valign="top">Regards,<br> Tcc Team</td>

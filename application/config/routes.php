@@ -58,3 +58,6 @@ $route['translate_uri_dashes'] = FALSE;
 $route['request-report-new'] = 'cron/Report_api/request_report_new';
 $route['update-report-status'] = 'cron/Report_api/update_report_status';
 $route['finance-order-data-summary'] = 'cron/Finance_api/finance_order_data_summary';
+
+$route['api-error-log'] = 'error-log/Api_error_log';
+$route['api-error-log/(:num)'] = 'error-log/Api_error_log';

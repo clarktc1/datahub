@@ -34,7 +34,7 @@ class Finance_api extends CI_Controller
     public function product_match($user_id='')
     {
         // die("hello dsfsdfds dsfds");
-        $users=$this->product_api->get_seller_for_process();
+        /*$users=$this->product_api->get_seller_for_process();
         // echo "<pre>";
         // print_r($users);
         // die();
@@ -54,8 +54,8 @@ class Finance_api extends CI_Controller
                 // echo "<prE>"; print_r($responseArray); die();
             }
         }
-        $this->rerun_finace_empty();
-        $this->send_error_mail();
+        $this->rerun_finace_empty();*/
+        send_error_mail();
     }
 
     public function saveFinanceData($res,$usr)
@@ -309,7 +309,7 @@ class Finance_api extends CI_Controller
         }
     }
 
-    public function send_error_mail()
+    /*public function send_error_mail()
     {
         $this->db->select('*');
         $this->db->from('mws_new_data_log');
@@ -345,5 +345,5 @@ class Finance_api extends CI_Controller
                 $this->db->update('mws_new_data_log',$changeStatus);
             }
         }
-    }
+    }*/
 }
