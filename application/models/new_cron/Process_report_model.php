@@ -71,7 +71,7 @@ class Process_report_model extends CI_Model
     {
       $sql.=" AND user_id=".$this->db->escape($user_id);
     }      
-    $sql.="INNER JOIN supported_country AS spt ON spt.amz_code=fed.market_id ";
+    $sql.=" INNER JOIN supported_country AS spt ON spt.amz_code=fed.market_id limit 10";
     $query=$this->db->query($sql);
     return $query->result_array();       
   }
