@@ -108,6 +108,7 @@ class Finance_api extends CI_Controller
             unset($res['payload']['ServiceFeeEventList']);
             unset($res['payload']['RefundEventList']);
             unset($res['payload']['AdjustmentEventList']);
+            $apiGetDateToData = $res['startDate']." to ".$res['createDate'];
             if (isset($res['payload'][0]) && !empty($res['payload'][0])) {
                 foreach ($res['payload'] as $key => $value) {
                     // if ( (isset($value['amazon_order_id']) && trim($value['amazon_order_id']) !='' ) && (isset($value['seller_order_id']) && trim($value['seller_order_id']) !='' ) ) {
@@ -151,18 +152,47 @@ class Finance_api extends CI_Controller
                         // sleep(2);
                         $value['fin_country'] = $usr['country_code'];
                         $value['added_by']    = $usr['profile_id'];
+
+                        // $value['extra']    = $usr['profile_id'];
+
                         $checkExits = $this->checkExits('finance_order_data',array('amazon_order_id' => $value['amazon_order_id'], 'dev_date' => $value['dev_date']));
                         if ($checkExits > 0 ) {
                             $value['finance_order_data_summary'] = 'n';
-                            $up = $this->updatedata('finance_order_data', $value, array('amazon_order_id' => $value['amazon_order_id'], 'dev_date' => $value['dev_date']));
+                            $checkUpDateFinData = $this->updatedata('finance_order_data', $value, array('amazon_order_id' => $value['amazon_order_id'], 'dev_date' => $value['dev_date']));
+                            if ($checkUpDateFinData) {
+                                $this->updatedata('rep_orders_data_order_date_list',['fee_flag' => 1 ], ['order_id' => $value['amazon_order_id'] ] );
+                                $this->updatedata('finance_data_log',['date' => $res['createDate'] ], ['user_id' => $usr['profile_id'] ] );
+                            } else {
+                                $saveErrorData = array();
+                                $saveErrorData['error'] = $this->db->error();
+                                $saveErrorData['error_dates'] = $apiGetDateToData;
+                                $mwsNewDataLogEmpty = array();
+                                $mwsNewDataLogEmpty['table_name'] = "Error Found finance_order_data update Query";
+                                $mwsNewDataLogEmpty['user_id']    = $usr['profile_id'];
+                                $mwsNewDataLogEmpty['data']       = json_encode($saveErrorData);
+                                $mwsNewDataLogEmpty['api_date']   = $res['createDate'];
+                                $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
+                                // break;
+                            }
                         } else {
-                            $this->insertdata('finance_order_data',$value);
+                            $checkInsertFinData = $this->insertdata('finance_order_data',$value);
+                            if ($checkInsertFinData) {
+                                $this->updatedata('rep_orders_data_order_date_list',['fee_flag' => 1 ], ['order_id' => $value['amazon_order_id'] ] );
+                                $this->updatedata('finance_data_log',['date' => $res['createDate'] ], ['user_id' => $usr['profile_id'] ] );
+                            } else {
+                                $saveErrorData = array();
+                                $saveErrorData['error'] = $this->db->error();
+                                $saveErrorData['error_dates'] = $apiGetDateToData;
+                                $mwsNewDataLogEmpty = array();
+                                $mwsNewDataLogEmpty['table_name'] = "Error Found finance_order_data insert Query";
+                                $mwsNewDataLogEmpty['user_id']    = $usr['profile_id'];
+                                $mwsNewDataLogEmpty['data']       = json_encode($saveErrorData);
+                                $mwsNewDataLogEmpty['api_date']   = $res['createDate'];
+                                $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
+                                // break;
+                            }
                             // $insert[] = $value;
                         }
-                        $up = $this->updatedata('rep_orders_data_order_date_list',['fee_flag' => 1 ], ['order_id' => $value['amazon_order_id'] ] );
-                        // if (strtotime($res['createDate']) < strtotime($date_now) ) {
-                            $this->updatedata('finance_data_log',['date' => $res['createDate'] ], ['user_id' => $usr['profile_id'] ] );
-                        // }
                     } else {
                         /*if (strtotime($res['createDate']) < strtotime($date_now) ) {
                             $createSubmitDate = date('Y-m-d', strtotime('+1 day', strtotime($res['createDate'])));
@@ -176,9 +206,9 @@ class Finance_api extends CI_Controller
                 if (isset($res['payload']) && empty($res['payload'][0])) {
                     if (empty($checkGetErrorLog)) {
                         $mwsNewDataLogEmpty = array();
-                        $mwsNewDataLogEmpty['table_name'] = "No Data Found";
+                        $mwsNewDataLogEmpty['table_name'] = "No Data Found finance_order_data";
                         $mwsNewDataLogEmpty['user_id']    = $usr['profile_id'];
-                        $mwsNewDataLogEmpty['data']       = $res['startDate']." to ".$res['createDate'];
+                        $mwsNewDataLogEmpty['data']       = $apiGetDateToData;
                         $mwsNewDataLogEmpty['api_date']   = $res['createDate'];
                         $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
                         $this->updatedata('finance_data_log',['date' => $res['createDate'] ], ['user_id' => $usr['profile_id'] ] );
