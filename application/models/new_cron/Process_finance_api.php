@@ -195,7 +195,7 @@ class Process_finance_api extends CI_Model
 
             if (isset($res->Error) && !empty($res->Error)) {
                 $responseError = array();
-                $responseError['table_name'] = "Error";
+                $responseError['table_name'] = "Api Error finance_order_data";
                 $responseError['user_id']    = $user_id;
                 $responseError['data']       = json_encode($res);
                 $responseError['api_date']   = $data["createDate"];
