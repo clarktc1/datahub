@@ -81,6 +81,14 @@ if (!function_exists('insertdata')) {
     }
 }
 
+if (!function_exists('deletedata')) {
+    function deletedata($tbname, $data)
+    {
+        $ci = & get_instance();
+        return $ci->db->delete($tbname, $data);
+    }
+}
+
 if (!function_exists('getTimeZoneDateTime')) {
     function getTimeZoneDateTime($get_posted_date, $marketplaceName)
     {

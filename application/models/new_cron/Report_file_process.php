@@ -464,18 +464,43 @@ public function process_order_update_data($user_id,$report_file,$country,$reques
 
                     $insertData['user_id'] = $user_id;
 
-                    $matchArray    = array('order_id' => $insertData['order_id'], 'dev_purchase_date' => $insertData['dev_purchase_date']);
+                    // print_r($insertData);
+                    // die();
+
+                    $matchDeleteArray    = array('order_id' => $insertData['order_id'], 'ord_sku' => $insertData['ord_sku'], 'dev_purchase_date' => null);
+                    $checkDeleteResponse = checkExits('rep_orders_update_list', $matchDeleteArray);
+                    if ($checkDeleteResponse > 0) {
+                        deletedata('rep_orders_update_list', $matchDeleteArray);
+                    }
+                    $matchArray    = array('order_id' => $insertData['order_id'], 'ord_sku' => $insertData['ord_sku']);
                     $checkResponse = checkExits('rep_orders_update_list', $matchArray);
                     if ($checkResponse > 0) {
-                        updatedata('rep_orders_update_list', $insertData, $matchArray);
+                        $checkUpdate = updatedata('rep_orders_update_list', $insertData, $matchArray);
+                        if (!$checkUpdate) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
                     } else {
-                        insertdata('rep_orders_update_list',$insertData);
+                        $checkInsert = insertdata('rep_orders_update_list',$insertData);
+                        if (!$checkInsert) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
                     }
                 }
                 $i++;
             }
             fclose($fp);
         }
+        return $responseData;
     } catch(Exception $e) {
         $responseData['response'] = 2;
         $responseData['msg']      = $e->getMessage();
@@ -687,8 +712,8 @@ public function process_order_data_by_date($user_id,$report_file,$country,$reque
                         $insertData['dev_purchase_date'] = $buffer[$getMatchDateKey];
                     }
 
-                    /*print_r($insertData);
-                    echo "<br>";
+                    // print_r($insertData);
+                    /* echo "<br>";
                     echo "=======================";
                     echo "<br>";*/
 
@@ -705,18 +730,40 @@ public function process_order_data_by_date($user_id,$report_file,$country,$reque
                     // print_r($insertData);
                     // die();
 
-                    $matchArray    = array('order_id' => $insertData['order_id'], 'dev_purchase_date' => $insertData['dev_purchase_date']);
+                    $matchDeleteArray    = array('order_id' => $insertData['order_id'], 'ord_sku' => $insertData['ord_sku'], 'dev_purchase_date' => null);
+                    $checkDeleteResponse = checkExits('rep_orders_data_order_date_list', $matchDeleteArray);
+                    if ($checkDeleteResponse > 0) {
+                        deletedata('rep_orders_data_order_date_list', $matchDeleteArray);
+                    }
+                    $matchArray    = array('order_id' => $insertData['order_id'], 'ord_sku' => $insertData['ord_sku']);
                     $checkResponse = checkExits('rep_orders_data_order_date_list', $matchArray);
                     if ($checkResponse > 0) {
-                        updatedata('rep_orders_data_order_date_list', $insertData, $matchArray);
+                        $checkUpdate = updatedata('rep_orders_data_order_date_list', $insertData, $matchArray);
+                        if (!$checkUpdate) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
                     } else {
-                        insertdata('rep_orders_data_order_date_list',$insertData);
+                        $checkInsert = insertdata('rep_orders_data_order_date_list',$insertData);
+                        if (!$checkInsert) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
                     }
                 }
                 $i++;
             }
             fclose($fp);
         }
+        return $responseData;
     } catch(Exception $e) {
         $responseData['response'] = 2;
         $responseData['msg']      = $e->getMessage();
@@ -1776,9 +1823,25 @@ public function process_restock_inv_data($user_id,$report_file,$country,$request
                     $matchArray    = array('res_country' => $insertData['res_country'], 'res_sku' => $insertData['res_sku'], 'res_asin' => $insertData['res_asin'], 'res_user_id' => $insertData['res_user_id']);
                     $checkResponse = checkExits('rep_restock_inv_data', $matchArray);
                     if ($checkResponse > 0) {
-                        updatedata('rep_restock_inv_data', $insertData, $matchArray);
+                        $checkUpdate = updatedata('rep_restock_inv_data', $insertData, $matchArray);
+                        if (!$checkUpdate) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
                     } else {
-                        insertdata('rep_restock_inv_data',$insertData);
+                        $checkInsert = insertdata('rep_restock_inv_data',$insertData);
+                        if (!$checkInsert) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
                     }
                 }
                 $i++;
