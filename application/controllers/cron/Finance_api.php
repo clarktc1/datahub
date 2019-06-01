@@ -2,6 +2,7 @@
 
 class Finance_api extends CI_Controller
 {
+    private $startDate; 
     public function  __construct()
     {
         parent::__construct();
@@ -60,6 +61,9 @@ class Finance_api extends CI_Controller
 
     public function saveFinanceData($res,$usr)
     {
+        if (isset($res['startDate'])) {
+            $this->startDate = $res['startDate'];
+        }
         if (!empty($res['payload']))
         {
             $date_now   = date('Y-m-d');
@@ -108,7 +112,7 @@ class Finance_api extends CI_Controller
             unset($res['payload']['ServiceFeeEventList']);
             unset($res['payload']['RefundEventList']);
             unset($res['payload']['AdjustmentEventList']);
-            $apiGetDateToData = $res['startDate']." to ".$res['createDate'];
+            $apiGetDateToData = $this->startDate." to ".$res['createDate'];
             if (isset($res['payload'][0]) && !empty($res['payload'][0])) {
                 foreach ($res['payload'] as $key => $value) {
                     // if ( (isset($value['amazon_order_id']) && trim($value['amazon_order_id']) !='' ) && (isset($value['seller_order_id']) && trim($value['seller_order_id']) !='' ) ) {
