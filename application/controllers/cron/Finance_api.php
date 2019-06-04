@@ -56,18 +56,21 @@ class Finance_api extends CI_Controller
             }
         }
         $this->rerun_finace_empty();
+        $this->finance_order_data_summary();
         send_error_mail();
     }
 
     public function saveFinanceData($res,$usr)
     {
+        // echo "<pre>"; print_r($res);
+        // die();
         if (isset($res['startDate'])) {
             $this->startDate = $res['startDate'];
         }
         if (!empty($res['payload']))
         {
-            $date_now   = date('Y-m-d');
-            $insert = [];
+            $date_now = date('Y-m-d');
+            $insert   = [];
             if ($res['payload']['mwsNewDataLog'] && !empty($res['payload']['mwsNewDataLog'])) {
                 foreach ($res['payload']['mwsNewDataLog'] as $mwsNewDataLog) {
                     $this->insertdata('mws_new_data_log',$mwsNewDataLog);
@@ -77,22 +80,34 @@ class Finance_api extends CI_Controller
                 foreach ($res['payload']['AdjustmentEventList'] as $adjustmentEventListValue) {
                     $adjustmentEventListValue['fin_country'] = $usr['country_code'];
                     $adjustmentEventListValue['added_by']    = $usr['profile_id'];
-                    // $checkExits = $this->checkExits('finance_adjustment_event_list', array('adjustmenttype' => $adjustmentEventListValue['adjustmenttype'], 'added_by' => $usr['profile_id']));
-                    // if ($checkExits > 0 ) {
-                    //     $up = $this->updatedata('finance_adjustment_event_list', $adjustmentEventListValue, array('adjustmenttype' => $adjustmentEventListValue['adjustmenttype'], 'added_by' => $usr['profile_id']));
-                    // } else {
-                    $adjustmentEventListValue['createDate']  = date('Y-m-d H:i:s');
-                    $this->insertdata('finance_adjustment_event_list',$adjustmentEventListValue);
-                    // }
+                    $checkExitsAdjustmentEventArray = array(
+                                                                'totalamount' => $adjustmentEventListValue['totalamount'],
+                                                                'adjustmenttype' => $adjustmentEventListValue['adjustmenttype'],
+                                                                'sellersku' => $adjustmentEventListValue['sellersku'],
+                                                                'added_by' => $usr['profile_id']
+                                                            );
+                    $checkExits = $this->checkExits('finance_adjustment_event_list', $checkExitsAdjustmentEventArray);
+                    if ($checkExits > 0 ) {
+                        $this->updatedata('finance_adjustment_event_list', $adjustmentEventListValue, $checkExitsAdjustmentEventArray);
+                    } else {
+                        $adjustmentEventListValue['createDate']  = date('Y-m-d H:i:s');
+                        $this->insertdata('finance_adjustment_event_list',$adjustmentEventListValue);
+                    }
                 }
             }
             if ($res['payload']['RefundEventList'] && !empty($res['payload']['RefundEventList'])) {
                 foreach ($res['payload']['RefundEventList'] as $refundEventListValue) {
                     $refundEventListValue['fin_country'] = $usr['country_code'];
                     $refundEventListValue['added_by']    = $usr['profile_id'];
-                    $checkExits = $this->checkExits('finance_refund_event_list', array('orderadjustmentitemid' => $refundEventListValue['orderadjustmentitemid'], 'added_by' => $usr['profile_id'], 'posteddate' => $refundEventListValue['posteddate']));
+                    $checkExitsRefundEventArray = array(
+                                                            'orderadjustmentitemid' => $refundEventListValue['orderadjustmentitemid'],
+                                                            'sellersku'             => $refundEventListValue['sellersku'],
+                                                            'added_by'              => $usr['profile_id'],
+                                                            'amazonorderid'         => $refundEventListValue['amazonorderid']
+                                                        );
+                    $checkExits = $this->checkExits('finance_refund_event_list', $checkExitsRefundEventArray);
                     if ($checkExits > 0 ) {
-                        $up = $this->updatedata('finance_refund_event_list', $refundEventListValue, array('orderadjustmentitemid' => $refundEventListValue['orderadjustmentitemid'], 'added_by' => $usr['profile_id'], 'posteddate' => $refundEventListValue['posteddate']));
+                        $this->updatedata('finance_refund_event_list', $refundEventListValue, $checkExitsRefundEventArray);
                     } else {
                         $refundEventListValue['createDate']  = date('Y-m-d H:i:s');
                         $this->insertdata('finance_refund_event_list',$refundEventListValue);
@@ -103,8 +118,18 @@ class Finance_api extends CI_Controller
                 foreach ($res['payload']['ServiceFeeEventList'] as $serviceFeeEventListValue) {
                     $serviceFeeEventListValue['fin_country'] = $usr['country_code'];
                     $serviceFeeEventListValue['added_by']    = $usr['profile_id'];
-                    $serviceFeeEventListValue['createDate']  = date('Y-m-d H:i:s');
-                    $this->insertdata('finance_service_fee_event_list',$serviceFeeEventListValue);
+                    $checkExitServiceFeeEventArray = array(
+                                                                'fee_amount' => $serviceFeeEventListValue['fee_amount'],
+                                                                'fee_type'   => $serviceFeeEventListValue['fee_type'],
+                                                                'added_by'   => $usr['profile_id']
+                                                            );
+                    $checkExits = $this->checkExits('finance_service_fee_event_list', $checkExitServiceFeeEventArray);
+                    if ($checkExits > 0 ) {
+                        $this->updatedata('finance_service_fee_event_list', $serviceFeeEventListValue, $checkExitServiceFeeEventArray);
+                    } else {
+                        $serviceFeeEventListValue['createDate']  = date('Y-m-d H:i:s');
+                        $this->insertdata('finance_service_fee_event_list',$serviceFeeEventListValue);
+                    }
                 }
             }
             $checkGetErrorLog = $res['payload']['mwsNewDataLog'];
@@ -205,7 +230,6 @@ class Finance_api extends CI_Controller
                         $this->updatedata('finance_data_log',['date' => $res['createDate'] ], ['user_id' => $usr['profile_id'] ] );
                     }
                 }
-                $this->finance_order_data_summary();
             } else {
                 if (isset($res['payload']) && empty($res['payload'][0])) {
                     if (empty($checkGetErrorLog)) {
@@ -253,6 +277,7 @@ class Finance_api extends CI_Controller
                 $finance_order_data_summary_array["added_by"] = $finance_order_data["added_by"];
                 $finance_order_data_summary_array["dev_date"] = $finance_order_data["dev_date"];
                 $finance_order_data_summary_array["marketplace"] = $finance_order_data["market_place"];
+                $finance_order_data_summary_array["type"]        = 'order';
                 $get_finance_order_item_data = $this->product_api->get_finance_order_item_data($finance_order_data);
                 if (!empty($get_finance_order_item_data)) {
                     $quantity            = 0;

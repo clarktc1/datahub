@@ -226,18 +226,28 @@ class Process_finance_api extends CI_Model
                 foreach ($getAdjustmentEventList as $getAdjustmentEvent) {
                     if ( isset($getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->PerUnitAmount)) {
                         $adjustmentEventListData[$adjustmentEventI]['perunitamount'] = (string) $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->PerUnitAmount->CurrencyAmount;
+                    } else {
+                        $adjustmentEventListData[$adjustmentEventI]['perunitamount'] = isset($adjustmentEventListData[$adjustmentEventI]['perunitamount']) ? $adjustmentEventListData[$adjustmentEventI]['perunitamount'] : '0.00';
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->TotalAmount)) {
                         $adjustmentEventListData[$adjustmentEventI]['totalamount'] = (string) $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->TotalAmount->CurrencyAmount;
+                    } else {
+                        $adjustmentEventListData[$adjustmentEventI]['totalamount'] = isset($adjustmentEventListData[$adjustmentEventI]['totalamount']) ? $adjustmentEventListData[$adjustmentEventI]['totalamount'] : '0.00';
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->Quantity)) {
                         $adjustmentEventListData[$adjustmentEventI]['quantity'] = (string) $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->Quantity;
+                    } else {
+                        $adjustmentEventListData[$adjustmentEventI]['quantity'] = isset($adjustmentEventListData[$adjustmentEventI]['quantity']) ? $adjustmentEventListData[$adjustmentEventI]['quantity'] : '0';
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->SellerSKU)) {
                         $adjustmentEventListData[$adjustmentEventI]['sellersku'] = (string) $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->SellerSKU;
+                    } else {
+                        $adjustmentEventListData[$adjustmentEventI]['sellersku'] = isset($adjustmentEventListData[$adjustmentEventI]['sellersku']) ? $adjustmentEventListData[$adjustmentEventI]['sellersku'] : '0';
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->ProductDescription)) {
                         $adjustmentEventListData[$adjustmentEventI]['productdescription'] = (string) $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->ProductDescription;
+                    } else {
+                        $adjustmentEventListData[$adjustmentEventI]['productdescription'] = isset($adjustmentEventListData[$adjustmentEventI]['productdescription']) ? $adjustmentEventListData[$adjustmentEventI]['productdescription'] : '';
                     }
                     if (isset($getAdjustmentEvent->AdjustmentItemList->AdjustmentItem)) {
                         $adjustmentItemData = $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem;
@@ -250,20 +260,93 @@ class Process_finance_api extends CI_Model
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentAmount)) {
                         $adjustmentEventListData[$adjustmentEventI]['adjustmentamount'] = (string) $getAdjustmentEvent->AdjustmentAmount->CurrencyAmount;
+                    } else {
+                        $adjustmentEventListData[$adjustmentEventI]['adjustmentamount'] = isset($adjustmentEventListData[$adjustmentEventI]['adjustmentamount']) ? $adjustmentEventListData[$adjustmentEventI]['adjustmentamount'] : '0.00';
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentType)) {
                         $adjustmentEventListData[$adjustmentEventI]['adjustmenttype'] = (string) $getAdjustmentEvent->AdjustmentType;
+                    } else {
+                        $adjustmentEventListData[$adjustmentEventI]['adjustmenttype'] = isset($adjustmentEventListData[$adjustmentEventI]['adjustmenttype']) ? $adjustmentEventListData[$adjustmentEventI]['adjustmenttype'] : '';
                     }
                     if ( isset($getAdjustmentEvent->PostedDate)) {
-                        $adjustmentEventPostedDate = (string) $getAdjustmentEvent->PostedDate;
-                        $adjustmentEventListData[$adjustmentEventI]['posteddate'] = $adjustmentEventPostedDate;
-                        $adjustmentEventListData[$adjustmentEventI]['dev_date'] = $adjustmentEventPostedDate;
+                        $adjustmentEventListData[$adjustmentEventI]['posteddate'] = (string) $getAdjustmentEvent->PostedDate;
+                    } else {
+                        $adjustmentEventListData[$adjustmentEventI]['posteddate'] = isset($adjustmentEventListData[$adjustmentEventI]['posteddate']) ? $adjustmentEventListData[$adjustmentEventI]['posteddate'] : '';
                     }
                     $adjustmentEventI++;
                 }
-            }
-            $payload['AdjustmentEventList'] = $adjustmentEventListData;
+                $payload['AdjustmentEventList'] = $adjustmentEventListData;
+            } else {
+                if (isset($res->ListFinancialEventsResult->FinancialEvents->AdjustmentEventList->AdjustmentEvent) || isset($res->ListFinancialEventsByNextTokenResult->FinancialEvents->AdjustmentEventList->AdjustmentEvent)) {
+                    
+                    if (isset($res->ListFinancialEventsResult->FinancialEvents->AdjustmentEventList->AdjustmentEvent)) {
+                        $getAdjustmentEventList = $res->ListFinancialEventsResult->FinancialEvents->AdjustmentEventList->AdjustmentEvent;
+                    }
+                    if (isset($res->ListFinancialEventsByNextTokenResult->FinancialEvents->AdjustmentEventList->AdjustmentEvent)) {
+                        $getAdjustmentEventList = $res->ListFinancialEventsByNextTokenResult->FinancialEvents->AdjustmentEventList->AdjustmentEvent;
+                    }
 
+                    $adjustmentEventUseKey = array('AdjustmentItemList','AdjustmentAmount','AdjustmentType','PostedDate');
+                    $checkResponse = $this->checkMwsNewApiKey($getAdjustmentEventList, $adjustmentEventUseKey, 'finance_adjustment_event_list', $user_id, $data["createDate"]);
+                    if ($checkResponse['status'] == 1) {
+                        unset($checkResponse['status']);
+                        $newKeyLog[] = $checkResponse;
+                    }
+
+                    if ( isset($getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->PerUnitAmount)) {
+                        $adjustmentEventListData[0]['perunitamount'] = (string) $getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->PerUnitAmount->CurrencyAmount;
+                    } else {
+                        $adjustmentEventListData[0]['perunitamount'] = isset($adjustmentEventListData[0]['perunitamount']) ? $adjustmentEventListData[0]['perunitamount'] : '0.00';
+                    }
+                    if ( isset($getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->TotalAmount)) {
+                        $adjustmentEventListData[0]['totalamount'] = (string) $getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->TotalAmount->CurrencyAmount;
+                    } else {
+                        $adjustmentEventListData[0]['totalamount'] = isset($adjustmentEventListData[0]['totalamount']) ? $adjustmentEventListData[0]['totalamount'] : '0.00';
+                    }
+                    if ( isset($getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->Quantity)) {
+                        $adjustmentEventListData[0]['quantity'] = (string) $getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->Quantity;
+                    } else {
+                        $adjustmentEventListData[0]['quantity'] = isset($adjustmentEventListData[0]['quantity']) ? $adjustmentEventListData[0]['quantity'] : '0';
+                    }
+                    if ( isset($getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->SellerSKU)) {
+                        $adjustmentEventListData[0]['sellersku'] = (string) $getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->SellerSKU;
+                    } else {
+                        $adjustmentEventListData[0]['sellersku'] = isset($adjustmentEventListData[0]['sellersku']) ? $adjustmentEventListData[0]['sellersku'] : '0';
+                    }
+                    if ( isset($getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->ProductDescription)) {
+                        $adjustmentEventListData[0]['productdescription'] = (string) $getAdjustmentEventList->AdjustmentItemList->AdjustmentItem->ProductDescription;
+                    } else {
+                        $adjustmentEventListData[0]['productdescription'] = isset($adjustmentEventListData[0]['productdescription']) ? $adjustmentEventListData[0]['productdescription'] : '';
+                    }
+
+                    if (isset($getAdjustmentEventList->AdjustmentItemList->AdjustmentItem)) {
+                        $adjustmentItemData = $getAdjustmentEventList->AdjustmentItemList->AdjustmentItem;
+                        $adjustmentEventUseKey = array('TotalAmount','PerUnitAmount','Quantity','SellerSKU','ProductDescription');
+                        $checkResponse = $this->checkMwsNewApiKey($adjustmentItemData, $adjustmentEventUseKey, 'finance_adjustment_event_list', $user_id, $data["createDate"]);
+                        if ($checkResponse['status'] == 1) {
+                            unset($checkResponse['status']);
+                            $newKeyLog[] = $checkResponse;
+                        }
+                    }
+
+                    if ( isset($getAdjustmentEventList->AdjustmentAmount)) {
+                        $adjustmentEventListData[0]['adjustmentamount'] = (string) $getAdjustmentEventList->AdjustmentAmount->CurrencyAmount;
+                    } else {
+                        $adjustmentEventListData[0]['adjustmentamount'] = isset($adjustmentEventListData[0]['adjustmentamount']) ? $adjustmentEventListData[0]['adjustmentamount'] : '0.00';
+                    }
+                    if ( isset($getAdjustmentEventList->AdjustmentType)) {
+                        $adjustmentEventListData[0]['adjustmenttype'] = (string) $getAdjustmentEvent->AdjustmentType;
+                    } else {
+                        $adjustmentEventListData[0]['adjustmenttype'] = isset($adjustmentEventListData[0]['adjustmenttype']) ? $adjustmentEventListData[0]['adjustmenttype'] : '';
+                    }
+                    if ( isset($getAdjustmentEventList->PostedDate)) {
+                        $adjustmentEventListData[0]['posteddate'] = (string) $getAdjustmentEventList->PostedDate;
+                    } else {
+                        $adjustmentEventListData[0]['posteddate'] = isset($adjustmentEventListData[0]['posteddate']) ? $adjustmentEventListData[0]['posteddate'] : '';
+                    }
+                }
+                $payload['AdjustmentEventList'] = $adjustmentEventListData;
+            }
             // print_r($newKeyLog);
             // print_r($adjustmentEventListData);
             // die();
@@ -310,7 +393,7 @@ class Process_finance_api extends CI_Model
                     }
                     $serviceFeeEventI++;
                 }
-                // $payload['ServiceFeeEventList'] = $serviceFeeEventListData;
+                $payload['ServiceFeeEventList'] = $serviceFeeEventListData;
             } else {
                 if (isset($res->ListFinancialEventsResult->FinancialEvents->ServiceFeeEventList->ServiceFeeEvent->FeeList) || isset($res->ListFinancialEventsByNextTokenResult->FinancialEvents->ServiceFeeEventList->ServiceFeeEvent->FeeList)) {
                     // $getServiceFeeEventList = $res->ListFinancialEventsResult->FinancialEvents->ServiceFeeEventList->ServiceFeeEvent;
@@ -340,8 +423,8 @@ class Process_finance_api extends CI_Model
                         $serviceFeeEventListData[0]['fee_amount'] = (string) $getServiceFeeEventList->FeeList->FeeComponent->FeeAmount->CurrencyAmount;
                     }
                 }
+                $payload['ServiceFeeEventList'] = $serviceFeeEventListData;
             }
-            $payload['ServiceFeeEventList'] = $serviceFeeEventListData;
             /* End ServiceFeeEventList Data */
             // print_r($newKeyLog);
             // print_r($serviceFeeEventListData);
@@ -375,8 +458,31 @@ class Process_finance_api extends CI_Model
                     $replaceData = array(' ','');
                     $changeData  = str_replace($searchData, $replaceData,$get_posted_date);
                     $posted_date = date('Y-m-d H:i:s', strtotime('-8 hours', strtotime($changeData)));*/
+                    $dateTime = new DateTime ($get_posted_date);
+                    $dateTime->setTimezone(new DateTimeZone('America/Los_Angeles'));
+                    $posted_date = $dateTime->format('Y-m-d H:i:s');
 
-                    $posted_date = getTimeZoneDateTime($get_posted_date, $marketplaceName);
+                    if (trim($marketplaceName)=="Amazon.co.uk") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/London'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.de") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Berlin'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.es") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Madrid'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.fr") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Paris'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    } elseif (trim($marketplaceName)=="Amazon.it") {
+                        $dateTime = new DateTime ($get_posted_date);
+                        $dateTime->setTimezone(new DateTimeZone('Europe/Rome'));
+                        $posted_date = $dateTime->format('Y-m-d H:i:s');
+                    }
 
                     $refundEventListData[$refundI]['amazonorderid']   = (string) $getRefundEvent->AmazonOrderId;
                     $refundEventListData[$refundI]['posteddate']      = $posted_date;
@@ -385,8 +491,6 @@ class Process_finance_api extends CI_Model
                     $refundEventListData[$refundI]['orderadjustmentitemid'] = (string) $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->OrderAdjustmentItemId;
                     $refundEventListData[$refundI]['quantityshipped']       = (string) $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->QuantityShipped;
                     $refundEventListData[$refundI]['sellersku']             = (string) $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->SellerSKU;
-                    $refundEventListData[$refundI]['dev_date']              = $get_posted_date;
-
                     
                     if (isset($getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->ItemTaxWithheldList->TaxWithheldComponent->TaxesWithheld->ChargeComponent[0])) {
                         $MarketplaceFacilitators = $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->ItemTaxWithheldList->TaxWithheldComponent->TaxesWithheld->ChargeComponent;
@@ -476,7 +580,7 @@ class Process_finance_api extends CI_Model
                     }
                     $refundI++;
                 }
-                // $payload['RefundEventList'] = $refundEventListData;
+                $payload['RefundEventList'] = $refundEventListData;
             } else {
                 if ((isset($res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent) && isset($res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent->AmazonOrderId)) || (isset($res->ListFinancialEventsByNextTokenResult->FinancialEvents->RefundEventList->ShipmentEvent) && isset($res->ListFinancialEventsByNextTokenResult->FinancialEvents->RefundEventList->ShipmentEvent->AmazonOrderId))) {
                     if (isset($res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent) && isset($res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent->AmazonOrderId)) {
@@ -622,9 +726,8 @@ class Process_finance_api extends CI_Model
                         }
                     }                    
                 }
-                // $payload['RefundEventList'] = $refundEventListData;
+                $payload['RefundEventList'] = $refundEventListData;
             }
-            $payload['RefundEventList'] = $refundEventListData;
             /* End Save RefundEventList Data Array */
             // print_r($newKeyLog);
             // print_r($refundEventListData);
