@@ -224,8 +224,10 @@ class Process_finance_api extends CI_Model
                 print_r($getAdjustmentEventList);*/
                 $adjustmentEventI = 0;
                 foreach ($getAdjustmentEventList as $getAdjustmentEvent) {
+                    $currencyCode = "";
                     if ( isset($getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->PerUnitAmount)) {
                         $adjustmentEventListData[$adjustmentEventI]['perunitamount'] = (string) $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->PerUnitAmount->CurrencyAmount;
+                        $currencyCode = (string) $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->PerUnitAmount->CurrencyCode;
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->TotalAmount)) {
                         $adjustmentEventListData[$adjustmentEventI]['totalamount'] = (string) $getAdjustmentEvent->AdjustmentItemList->AdjustmentItem->TotalAmount->CurrencyAmount;
@@ -250,13 +252,14 @@ class Process_finance_api extends CI_Model
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentAmount)) {
                         $adjustmentEventListData[$adjustmentEventI]['adjustmentamount'] = (string) $getAdjustmentEvent->AdjustmentAmount->CurrencyAmount;
+                        $currencyCode = (string) $getAdjustmentEvent->AdjustmentAmount->CurrencyCode;
                     }
                     if ( isset($getAdjustmentEvent->AdjustmentType)) {
                         $adjustmentEventListData[$adjustmentEventI]['adjustmenttype'] = (string) $getAdjustmentEvent->AdjustmentType;
                     }
                     if ( isset($getAdjustmentEvent->PostedDate)) {
                         $adjustmentEventPostedDate = (string) $getAdjustmentEvent->PostedDate;
-                        $adjustmentEventListData[$adjustmentEventI]['posteddate'] = $adjustmentEventPostedDate;
+                        $adjustmentEventListData[$adjustmentEventI]['posteddate'] = getTimeZoneDateTime($adjustmentEventPostedDate,trim($currencyCode));
                         $adjustmentEventListData[$adjustmentEventI]['dev_date'] = $adjustmentEventPostedDate;
                     }
                     $adjustmentEventI++;

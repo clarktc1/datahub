@@ -97,11 +97,11 @@ if (!function_exists('getTimeZoneDateTime')) {
         $dateTime->setTimezone(new DateTimeZone('America/Los_Angeles'));
         $posted_date = $dateTime->format('Y-m-d H:i:s');
 
-        if (trim($marketplaceName)=="Amazon.co.uk" || trim($marketplaceName)=="SI UK Prod Marketplace") {
+        if (trim($marketplaceName)=="Amazon.co.uk" || trim($marketplaceName)=="SI UK Prod Marketplace" || trim($marketplaceName)=="GBP") {
             $dateTime = new DateTime ($get_posted_date);
             $dateTime->setTimezone(new DateTimeZone('GMT'));
             $posted_date = $dateTime->format('Y-m-d H:i:s');
-        } elseif (trim($marketplaceName)=="Amazon.de" || trim($marketplaceName)=="SI DE Prod Marketplace") {
+        } elseif (trim($marketplaceName)=="Amazon.de" || trim($marketplaceName)=="SI DE Prod Marketplace" || trim($marketplaceName)=="EUR") {
             $dateTime = new DateTime ($get_posted_date);
             $dateTime->setTimezone(new DateTimeZone('Europe/Berlin'));
             $posted_date = $dateTime->format('Y-m-d H:i:s');
