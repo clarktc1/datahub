@@ -62,20 +62,70 @@ class Report_file_process extends CI_Model
 
     public function process_inventory_data($user_id,$report_file,$country,$request_type)
     {
+        // echo "<pre>";
         $responseData = array();
         $responseData['response'] = 1;
         $responseData['msg'] = "";
         $responseData['table_name'] = "active_inventory_data";
         try {
+            $dataBaseColumnName = array(
+                                            'item-name' => 'item_name',
+                                            'item-description' => 'item_description',
+                                            'listing-id' => 'listing_id',
+                                            'seller-sku' => 'seller_sku',
+                                            'price' => 'price',
+                                            'quantity' => 'quantity',
+                                            'open-date' => 'open_date',
+                                            'image-url' => 'image_url',
+                                            'item-is-marketplace' => 'item_is_marketplace',
+                                            'product-id-type' => 'product_id_type',
+                                            'zshop-shipping-fee' => 'zshop_shipping_fee',
+                                            'item-note' => 'item_note',
+                                            'item-condition' => 'item_condition',
+                                            'zshop-category1' => 'zshop_category1',
+                                            'zshop-browse-path' => 'zshop_browse_path',
+                                            'zshop-storefront-feature' => 'zshop_storefront_feature',
+                                            'asin1' => 'asin1',
+                                            'asin2' => 'asin2',
+                                            'asin3' => 'asin3',
+                                            'will-ship-internationally' => 'will_ship_internationally',
+                                            'expedited-shipping' => 'expedited_shipping',
+                                            'zshop-boldface' => 'zshop_boldface',
+                                            'product-id' => 'product_id',
+                                            'bid-for-featured-placement' => 'bid_for_featured_placement',
+                                            'add-delete' => 'add_delete',
+                                            'pending-quantity' => 'pending_quantity',
+                                            'fulfillment-channel' => 'fulfillment_channel',
+                                            'business-price' => 'business_price',
+                                            'quantity-price-type' => 'quantity_price_type',
+                                            'quantity-lower-bound-1' => 'quantity_lower_bound_1',
+                                            'quantity-price-1' => 'quantity_price_1',
+                                            'quantity-lower-bound-2' => 'quantity_lower_bound_2',
+                                            'quantity-price-2' => 'quantity_price_2',
+                                            'quantity-lower-bound-3' => 'quantity_lower_bound_3',
+                                            'quantity-price-3' => 'quantity_price_3',
+                                            'quantity-lower-bound-4' => 'quantity_lower_bound_4',
+                                            'quantity-price-4' => 'quantity_price_4',
+                                            'quantity-lower-bound-5' => 'quantity_lower_bound_5',
+                                            'quantity-price-5' => 'quantity_price_5',
+                                            'merchant-shipping-group' => 'merchant_shipping_group'
+                                        );
+
+
             $fp=fopen($report_file,'r');
             if ($fp)
             {
                 $i=0;
+                $csvColumnNames = array();
                 while (!feof($fp)) 
                 {
                     $buffer = fgetcsv($fp,0,"\t");
-                    if($i>=1 && isset($buffer[0]) && !empty(trim($buffer[0])))
-                    {
+                    // print_r($buffer);
+                    if ($i===0) {
+                        $csvColumnNames = $buffer;
+                    }
+
+                    if($i>=1 && isset($buffer[0]) && !empty(trim($buffer[0]))) {
                         if (strpos($buffer[0],"ErrorResponse")) {
                             $responseData['response'] = 2;
                             $getFileErrorXml     = simplexml_load_file($report_file);
@@ -86,144 +136,56 @@ class Report_file_process extends CI_Model
                             break;
                         }
                     }
-                    if($i>=1 && !empty($buffer[3]) && $country!='FR')
-                    {
-                        $item_name=isset($buffer[0])?$this->db->escape($buffer[0]):'';
-                        $item_description=isset($buffer[1])?$this->db->escape($buffer[1]):'';
-                        $listing_id=isset($buffer[2])?$this->db->escape($buffer[2]):'';
-                        $seller_sku=isset($buffer[3])?$this->db->escape($buffer[3]):'';
-                        $price=isset($buffer[4])?$this->db->escape($buffer[4]):'';
-                        $quantity=isset($buffer[5])?$this->db->escape($buffer[5]):'';
-                        $open_dat=isset($buffer[6])?$this->db->escape($buffer[6]):'';
-                        $date = substr($open_dat, 1, 20);
-                        $date_format=date( 'd-m-Y H:i:s', strtotime(str_replace('/', '-', $date ) ));
-                        $open_date=$this->db->escape(date('Y-m-d H:i:s',strtotime($date_format)));
-                        $image_url=isset($buffer[7])?$this->db->escape($buffer[7]):'';
-                        $item_is_marketplace=isset($buffer[8])?$this->db->escape($buffer[8]):'';
-                        $product_id_type=isset($buffer[9])?$this->db->escape($buffer[9]):'';
-                        $zshop_shipping_fee=isset($buffer[10])?$this->db->escape($buffer[10]):'';
-                        $item_note=isset($buffer[11])?$this->db->escape($buffer[11]):'';
-                        $item_condition=isset($buffer[12])?$this->db->escape($buffer[12]):'';
-                        $zshop_category1=isset($buffer[13])?$this->db->escape($buffer[13]):'';
-                        $zshop_browse_path=isset($buffer[14])?$this->db->escape($buffer[14]):'';
-                        $zshop_storefront_feature=isset($buffer[15])?$this->db->escape($buffer[15]):'';
-                        $asin1=isset($buffer[16])?$this->db->escape($buffer[16]):'';
-                        $asin2=isset($buffer[17])?$this->db->escape($buffer[17]):'';
-                        $asin3=isset($buffer[18])?$this->db->escape($buffer[18]):'';
-                        $will_ship_internationally=isset($buffer[19])?$this->db->escape($buffer[19]):'';
-                        $expedited_shipping=isset($buffer[20])?$this->db->escape($buffer[20]):'';
-                        $zshop_boldface=isset($buffer[21])?$this->db->escape($buffer[21]):'';
-                        $product_id=isset($buffer[22])?$this->db->escape($buffer[22]):'';
-                        $bid_for_featured_placement=isset($buffer[23])?$this->db->escape($buffer[23]):'';
-                        $add_delete=isset($buffer[24])?$this->db->escape($buffer[24]):'';
-                        $pending_quantity=isset($buffer[25])?$this->db->escape($buffer[25]):'';
-                        $fulfillment_channel=isset($buffer[26])?$this->db->escape($buffer[26]):'';
-                        $business_price=isset($buffer[27])?$this->db->escape($buffer[27]):'';
-                        $quantity_price_type=isset($buffer[28])?$this->db->escape($buffer[28]):'';
-                        $quantity_lower_bound_1=isset($buffer[29])?$this->db->escape($buffer[29]):'';
-                        $quantity_price_1=isset($buffer[30])?$this->db->escape($buffer[30]):'';
-                        $quantity_lower_bound_2=isset($buffer[31])?$this->db->escape($buffer[31]):'';
-                        $quantity_price_2=isset($buffer[32])?$this->db->escape($buffer[32]):'';
-                        $quantity_lower_bound_3=isset($buffer[33])?$this->db->escape($buffer[33]):'';
-                        $quantity_price_3=isset($buffer[34])?$this->db->escape($buffer[34]):'';
-                        $quantity_lower_bound_4=isset($buffer[35])?$this->db->escape($buffer[35]):'';
-                        $quantity_price_4=isset($buffer[36])?$this->db->escape($buffer[36]):'';
-                        $quantity_lower_bound_5=isset($buffer[37])?$this->db->escape($buffer[37]):'';
-                        $quantity_price_5=isset($buffer[38])?$this->db->escape($buffer[38]):'';
-                        $merchant_shipping_group=isset($buffer[39])?$this->db->escape($buffer[39]):'';
 
-                        $bulk_data[]="(".$item_name.",".$item_description.",".$listing_id.",".$seller_sku.",".$price.",".$quantity.",".$open_date.",".$image_url.",".$item_is_marketplace.",".$product_id_type.",".$zshop_shipping_fee.",".$item_note.",".$item_condition.",".$zshop_category1.",".$zshop_browse_path.",".$zshop_storefront_feature.",".$asin1.",".$asin2.",".$asin3.",".$will_ship_internationally.",".$expedited_shipping.",".$zshop_boldface.",".$product_id.",".$bid_for_featured_placement.",".$add_delete.",".$pending_quantity.",".$fulfillment_channel.",".$business_price.",".$quantity_price_type.",".$quantity_lower_bound_1.",".$quantity_price_1.",".$quantity_lower_bound_2.",".$quantity_price_2.",".$quantity_lower_bound_3.",".$quantity_price_3.",".$quantity_lower_bound_4.",".$quantity_price_4.",".$quantity_lower_bound_5.",".$quantity_price_5.",".$merchant_shipping_group.",'".$country."','".$user_id."')";
-                    }
-                    elseif($i>=1 && !empty($buffer[3]) && $country='FR')
+                    if($i>=1 && !empty($buffer[3]))
                     {
-                        $item_name=isset($buffer[0])?$this->db->escape($buffer[0]):'';
-                        $listing_id=isset($buffer[1])?$this->db->escape($buffer[1]):'';
-                        $seller_sku=isset($buffer[2])?$this->db->escape($buffer[2]):'';
-                        $price=isset($buffer[3])?$this->db->escape($buffer[3]):'';
-                        $quantity=isset($buffer[4])?$this->db->escape($buffer[4]):'';
-                        $open_dat=isset($buffer[5])?$this->db->escape($buffer[5]):'';
-                        $date = substr($open_dat, 1, 20);
-                        $date_format=date('d-m-Y H:i:s', strtotime(str_replace('/', '-', $date ) ));
-                        $open_date=$this->db->escape(date('Y-m-d H:i:s',strtotime($date_format)));
-                        $product_id_type=isset($buffer[6])?$this->db->escape($buffer[6]):'';
-                        $item_note=isset($buffer[7])?$this->db->escape($buffer[7]):'';
-                        $item_condition=isset($buffer[8])?$this->db->escape($buffer[8]):'';
-                        $will_ship_internationally=isset($buffer[9])?$this->db->escape($buffer[9]):'';
-                        $expedited_shipping=isset($buffer[10])?$this->db->escape($buffer[10]):'';
-                        $product_id=isset($buffer[11])?$this->db->escape($buffer[11]):'';
-                        $pending_quantity=isset($buffer[12])?$this->db->escape($buffer[12]):'';
-                        $fulfillment_channel=isset($buffer[13])?$this->db->escape($buffer[13]):'';
-                        $business_price=isset($buffer[14])?$this->db->escape($buffer[14]):'';
-                        $quantity_price_type=isset($buffer[15])?$this->db->escape($buffer[15]):'';
-                        $quantity_lower_bound_1=isset($buffer[16])?$this->db->escape($buffer[16]):'';
-                        $quantity_price_1=isset($buffer[17])?$this->db->escape($buffer[17]):'';
-                        $quantity_lower_bound_2=isset($buffer[18])?$this->db->escape($buffer[18]):'';
-                        $quantity_price_2=isset($buffer[19])?$this->db->escape($buffer[19]):'';
-                        $quantity_lower_bound_3=isset($buffer[20])?$this->db->escape($buffer[20]):'';
-                        $quantity_price_3=isset($buffer[21])?$this->db->escape($buffer[21]):'';
-                        $quantity_lower_bound_4=isset($buffer[22])?$this->db->escape($buffer[22]):'';
-                        $quantity_price_4=isset($buffer[23])?$this->db->escape($buffer[23]):'';
-                        $quantity_lower_bound_5=isset($buffer[24])?$this->db->escape($buffer[24]):'';
-                        $quantity_price_5=isset($buffer[25])?$this->db->escape($buffer[25]):'';
-                        $merchant_shipping_group=isset($buffer[26])?$this->db->escape($buffer[26]):'';
-                        $item_description="''";
-                        $image_url="''";
-                        $item_is_marketplace="''";
-                        $zshop_shipping_fee="''";
-                        $zshop_category1="''";
-                        $zshop_browse_path="''";
-                        $zshop_storefront_feature="''";
-                        $asin1="''";
-                        $asin2="''";
-                        $asin3="''";
-                        $zshop_boldface="''";
-                        $bid_for_featured_placement="''";
-                        $add_delete="''";
-
-                        $bulk_data[]="(".$item_name.",".$item_description.",".$listing_id.",".$seller_sku.",".$price.",".$quantity.",".$open_date.",".$image_url.",".$item_is_marketplace.",".$product_id_type.",".$zshop_shipping_fee.",".$item_note.",".$item_condition.",".$zshop_category1.",".$zshop_browse_path.",".$zshop_storefront_feature.",".$asin1.",".$asin2.",".$asin3.",".$will_ship_internationally.",".$expedited_shipping.",".$zshop_boldface.",".$product_id.",".$bid_for_featured_placement.",".$add_delete.",".$pending_quantity.",".$fulfillment_channel.",".$business_price.",".$quantity_price_type.",".$quantity_lower_bound_1.",".$quantity_price_1.",".$quantity_lower_bound_2.",".$quantity_price_2.",".$quantity_lower_bound_3.",".$quantity_price_3.",".$quantity_lower_bound_4.",".$quantity_price_4.",".$quantity_lower_bound_5.",".$quantity_price_5.",".$merchant_shipping_group.",'".$country."','".$user_id."')";
-                    }
-                    //print_r($bulk_data);
-                    if(isset($bulk_data) && count($bulk_data)>=500)
-                    {
-                        $quer=implode(',',$bulk_data);
-                        $qi="INSERT INTO `active_inventory_data` (item_name,item_description,listing_id,seller_sku,price,quantity,open_date,image_url,item_is_marketplace,product_id_type,zshop_shipping_fee,item_note,item_condition,zshop_category1,zshop_browse_path,zshop_storefront_feature,asin1,asin2,asin3,will_ship_internationally,expedited_shipping,zshop_boldface,product_id,bid_for_featured_placement,add_delete,pending_quantity,fulfillment_channel,business_price,quantity_price_type,quantity_lower_bound_1,quantity_price_1,quantity_lower_bound_2,quantity_price_2,quantity_lower_bound_3,quantity_price_3,quantity_lower_bound_4,quantity_price_4,quantity_lower_bound_5,quantity_price_5,merchant_shipping_group,country,added_by)VALUES 
-                        $quer 
-                        ON DUPLICATE KEY 
-                        UPDATE
-                        item_name=VALUES(item_name),item_description=VALUES(item_description),listing_id=VALUES(listing_id),seller_sku=VALUES(seller_sku),price=VALUES(price),quantity=VALUES(quantity),open_date=VALUES(open_date),image_url=VALUES(image_url),item_is_marketplace=VALUES(item_is_marketplace),product_id_type=VALUES(product_id_type),zshop_shipping_fee=VALUES(zshop_shipping_fee),item_note=VALUES(item_note),item_condition=VALUES(item_condition),zshop_category1=VALUES(zshop_category1),zshop_browse_path=VALUES(zshop_browse_path),zshop_storefront_feature=VALUES(zshop_storefront_feature),asin1=VALUES(asin1),asin2=VALUES(asin2),asin3=VALUES(asin3),will_ship_internationally=VALUES(will_ship_internationally),expedited_shipping=VALUES(expedited_shipping),zshop_boldface=VALUES(zshop_boldface),product_id=VALUES(product_id),bid_for_featured_placement=VALUES(bid_for_featured_placement),add_delete=VALUES(add_delete),pending_quantity=VALUES(pending_quantity),fulfillment_channel=VALUES(fulfillment_channel),business_price=VALUES(business_price),quantity_price_type=VALUES(quantity_price_type),quantity_lower_bound_1=VALUES(quantity_lower_bound_1),quantity_price_1=VALUES(quantity_price_1),quantity_lower_bound_2=VALUES(quantity_lower_bound_2),quantity_price_2=VALUES(quantity_price_2),quantity_lower_bound_3=VALUES(quantity_lower_bound_3),quantity_price_3=VALUES(quantity_price_3),quantity_lower_bound_4=VALUES(quantity_lower_bound_4),quantity_price_4=VALUES(quantity_price_4),quantity_lower_bound_5=VALUES(quantity_lower_bound_5),quantity_price_5=VALUES(quantity_price_5),merchant_shipping_group=VALUES(merchant_shipping_group),country=VALUES(country),added_by=VALUES(added_by);";
-                        $checkAddUpdateData = $this->db->query($qi);
-                        if (!$checkAddUpdateData) {
-                            $error = get_instance()->db->error();
-                            $responseData['response'] = 2;
-                            $responseData['msg']      = $error;
-                            $responseData['fileName'] = $report_file;
-                            return $responseData;
-                            break;
+                        $insertData = array();
+                        foreach ($csvColumnNames as $key => $csvColumnName) {
+                            if (in_array($csvColumnName, $csvColumnNames)) {
+                                $getMatchKey = array_search($csvColumnName, $csvColumnNames);
+                                if (isset($dataBaseColumnName[$csvColumnName])) {
+                                    $insertData[$dataBaseColumnName[$csvColumnName]] = $buffer[$getMatchKey];
+                                }
+                            }
                         }
-                        unset($bulk_data);
-                        unset($quer);
+
+                        foreach ($dataBaseColumnName as $checkColumnName) {
+                            if (!array_key_exists($checkColumnName,$insertData)) {
+                                $insertData[$checkColumnName] = "";
+                            }
+                        }
+
+                        $insertData['added_by'] = $user_id;
+                        $insertData['country']  = $country;
+                        // print_r($insertData);
+
+                        $matchArray    = array('seller_sku' => $insertData['seller_sku'], 'country' => $insertData['country'], 'added_by' => $insertData['added_by']);
+                        $checkResponse = checkExits('active_inventory_data', $matchArray);
+                        if ($checkResponse > 0) {
+                            $checkUpdate = updatedata('active_inventory_data', $insertData, $matchArray);
+                            if (!$checkUpdate) {
+                                $getError = $this->db->error();
+                                $responseData['response'] = 2;
+                                $responseData['msg']      = $getError;
+                                $responseData['fileName'] = $report_file;
+                                return $responseData;
+                                break;
+                            }
+                        } else {
+                            $checkInsert = insertdata('active_inventory_data',$insertData);
+                            if (!$checkInsert) {
+                                $getError = $this->db->error();
+                                $responseData['response'] = 2;
+                                $responseData['msg']      = $getError;
+                                $responseData['fileName'] = $report_file;
+                                return $responseData;
+                                break;
+                            }
+                        }
+                        // die("one data");
                     }
                     $i++;
                 }//while ends here
-                if(isset($bulk_data) && count($bulk_data)<500 && count($bulk_data)>0)
-                {
-                    $quer=implode(',',$bulk_data);
-                    $qi="INSERT INTO `active_inventory_data` (item_name,item_description,listing_id,seller_sku,price,quantity,open_date,image_url,item_is_marketplace,product_id_type,zshop_shipping_fee,item_note,item_condition,zshop_category1,zshop_browse_path,zshop_storefront_feature,asin1,asin2,asin3,will_ship_internationally,expedited_shipping,zshop_boldface,product_id,bid_for_featured_placement,add_delete,pending_quantity,fulfillment_channel,business_price,quantity_price_type,quantity_lower_bound_1,quantity_price_1,quantity_lower_bound_2,quantity_price_2,quantity_lower_bound_3,quantity_price_3,quantity_lower_bound_4,quantity_price_4,quantity_lower_bound_5,quantity_price_5,merchant_shipping_group,country,added_by)VALUES 
-                    $quer 
-                    ON DUPLICATE KEY 
-                    UPDATE
-                    item_name=VALUES(item_name),item_description=VALUES(item_description),listing_id=VALUES(listing_id),seller_sku=VALUES(seller_sku),price=VALUES(price),quantity=VALUES(quantity),open_date=VALUES(open_date),image_url=VALUES(image_url),item_is_marketplace=VALUES(item_is_marketplace),product_id_type=VALUES(product_id_type),zshop_shipping_fee=VALUES(zshop_shipping_fee),item_note=VALUES(item_note),item_condition=VALUES(item_condition),zshop_category1=VALUES(zshop_category1),zshop_browse_path=VALUES(zshop_browse_path),zshop_storefront_feature=VALUES(zshop_storefront_feature),asin1=VALUES(asin1),asin2=VALUES(asin2),asin3=VALUES(asin3),will_ship_internationally=VALUES(will_ship_internationally),expedited_shipping=VALUES(expedited_shipping),zshop_boldface=VALUES(zshop_boldface),product_id=VALUES(product_id),bid_for_featured_placement=VALUES(bid_for_featured_placement),add_delete=VALUES(add_delete),pending_quantity=VALUES(pending_quantity),fulfillment_channel=VALUES(fulfillment_channel),business_price=VALUES(business_price),quantity_price_type=VALUES(quantity_price_type),quantity_lower_bound_1=VALUES(quantity_lower_bound_1),quantity_price_1=VALUES(quantity_price_1),quantity_lower_bound_2=VALUES(quantity_lower_bound_2),quantity_price_2=VALUES(quantity_price_2),quantity_lower_bound_3=VALUES(quantity_lower_bound_3),quantity_price_3=VALUES(quantity_price_3),quantity_lower_bound_4=VALUES(quantity_lower_bound_4),quantity_price_4=VALUES(quantity_price_4),quantity_lower_bound_5=VALUES(quantity_lower_bound_5),quantity_price_5=VALUES(quantity_price_5),merchant_shipping_group=VALUES(merchant_shipping_group),country=VALUES(country),added_by=VALUES(added_by);";
-                    $checkAddUpdateData = $this->db->query($qi);
-                    if (!$checkAddUpdateData) {
-                        $error = get_instance()->db->error();
-                        $responseData['response'] = 2;
-                        $responseData['msg']      = $error;
-                        $responseData['fileName'] = $report_file;
-                        return $responseData;
-                    }
-                    unset($bulk_data);
-                    unset($quer);
-                }
                 fclose($fp);
             }
             return $responseData;
@@ -234,6 +196,7 @@ class Report_file_process extends CI_Model
             return $responseData;
         }
     }
+
 
 public function process_inactive_inventory_data($user_id,$report_file,$country,$request_type)
 {
