@@ -260,7 +260,8 @@ class Process_finance_api extends CI_Model
                     if ( isset($getAdjustmentEvent->PostedDate)) {
                         $adjustmentEventPostedDate = (string) $getAdjustmentEvent->PostedDate;
                         $adjustmentEventListData[$adjustmentEventI]['posteddate'] = getTimeZoneDateTime($adjustmentEventPostedDate,trim($currencyCode));
-                        $adjustmentEventListData[$adjustmentEventI]['dev_date'] = $adjustmentEventPostedDate;
+                        $adjustmentEventListData[$adjustmentEventI]['dev_date']   = $adjustmentEventPostedDate;
+                        $adjustmentEventListData[$adjustmentEventI]['currency']   = $currencyCode;
                     }
                     $adjustmentEventI++;
                 }
@@ -310,6 +311,7 @@ class Process_finance_api extends CI_Model
                     }
                     if (isset($getServiceFeeEvent->FeeList->FeeComponent->FeeAmount->CurrencyAmount)) {
                         $serviceFeeEventListData[$serviceFeeEventI]['fee_amount'] = (string) $getServiceFeeEvent->FeeList->FeeComponent->FeeAmount->CurrencyAmount;
+                        $serviceFeeEventListData[$serviceFeeEventI]['currency']   = (string) $getServiceFeeEvent->FeeList->FeeComponent->FeeAmount->CurrencyCode;
                     }
                     $serviceFeeEventI++;
                 }
@@ -341,6 +343,7 @@ class Process_finance_api extends CI_Model
                     }
                     if (isset($getServiceFeeEventList->FeeList->FeeComponent->FeeAmount->CurrencyAmount)) {
                         $serviceFeeEventListData[0]['fee_amount'] = (string) $getServiceFeeEventList->FeeList->FeeComponent->FeeAmount->CurrencyAmount;
+                        $serviceFeeEventListData[0]['currency']   = (string) $getServiceFeeEventList->FeeList->FeeComponent->FeeAmount->CurrencyCode;
                     }
                 }
             }
@@ -396,9 +399,11 @@ class Process_finance_api extends CI_Model
                         foreach ($MarketplaceFacilitators as $MarketplaceFacilitator) {
                             if ( (string) $MarketplaceFacilitator->ChargeType == "MarketplaceFacilitatorTax-Shipping") {
                                 $refundEventListData[$refundI]['marketplacefacilitatortaxshipping'] = (string) $MarketplaceFacilitator->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $MarketplaceFacilitator->ChargeAmount->CurrencyCode;
                             }
                             if ( (string) $MarketplaceFacilitator->ChargeType == "MarketplaceFacilitatorTax-Principal") {
                                 $refundEventListData[$refundI]['marketplacefacilitatortaxprincipal'] = (string) $MarketplaceFacilitator->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $MarketplaceFacilitator->ChargeAmount->CurrencyCode;
                             }
                         }
                     }
@@ -426,9 +431,11 @@ class Process_finance_api extends CI_Model
                         $MarketplaceFacilitators = $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->ItemTaxWithheldList->TaxWithheldComponent->TaxesWithheld->ChargeComponent->ChargeType;
                         if ( (string) $MarketplaceFacilitators->ChargeType == "MarketplaceFacilitatorTax-Shipping") {
                             $refundEventListData[$refundI]['marketplacefacilitatortaxshipping'] = (string) $MarketplaceFacilitators->ChargeAmount->CurrencyAmount;
+                            $refundCurrency = (string) $MarketplaceFacilitators->ChargeAmount->CurrencyCode;
                         }
                         if ( (string) $MarketplaceFacilitators->ChargeType == "MarketplaceFacilitatorTax-Principal") {
                             $refundEventListData[$refundI]['marketplacefacilitatortaxprincipal'] = (string) $MarketplaceFacilitators->ChargeAmount->CurrencyAmount;
+                            $refundCurrency = (string) $MarketplaceFacilitators->ChargeAmount->CurrencyCode;
                         }
                     }
 
@@ -453,9 +460,11 @@ class Process_finance_api extends CI_Model
                         foreach ($refundShipmentItems as $refundShipmentItem) {
                             if ( (string) $refundShipmentItem->FeeType == "Commission") {
                                 $refundEventListData[$refundI]['commission'] = (string) $refundShipmentItem->FeeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundShipmentItem->FeeAmount->CurrencyCode;
                             }
                             if ( (string) $refundShipmentItem->FeeType == "RefundCommission") {
                                 $refundEventListData[$refundI]['refundcommission'] = (string) $refundShipmentItem->FeeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundShipmentItem->FeeAmount->CurrencyCode;
                             }
                         }
                     }
@@ -465,18 +474,23 @@ class Process_finance_api extends CI_Model
                         foreach ($refundChargeComponents as $refundChargeComponent) {
                             if ( (string) $refundChargeComponent->ChargeType == "Tax") {
                                 $refundEventListData[$refundI]['tax'] = (string) $refundChargeComponent->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundChargeComponent->ChargeAmount->CurrencyCode;
                             }
                             if ( (string) $refundChargeComponent->ChargeType == "Principal") {
                                 $refundEventListData[$refundI]['principal'] = (string) $refundChargeComponent->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundChargeComponent->ChargeAmount->CurrencyCode;
                             }
                             if ( (string) $refundChargeComponent->ChargeType == "ShippingTax") {
                                 $refundEventListData[$refundI]['shippingtax'] = (string) $refundChargeComponent->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundChargeComponent->ChargeAmount->CurrencyCode;
                             }
                             if ( (string) $refundChargeComponent->ChargeType == "ShippingCharge") {
                                 $refundEventListData[$refundI]['shippingcharge'] = (string) $refundChargeComponent->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundChargeComponent->ChargeAmount->CurrencyCode;
                             }
                         }
                     }
+                    $refundEventListData[$refundI]['currency'] = $refundCurrency;
                     $refundI++;
                 }
                 // $payload['RefundEventList'] = $refundEventListData;
@@ -562,9 +576,11 @@ class Process_finance_api extends CI_Model
                         foreach ($MarketplaceFacilitators as $MarketplaceFacilitator) {
                             if ( (string) $MarketplaceFacilitator->ChargeType == "MarketplaceFacilitatorTax-Shipping") {
                                 $refundEventListData[0]['marketplacefacilitatortaxshipping'] = (string) $MarketplaceFacilitator->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $MarketplaceFacilitator->ChargeAmount->CurrencyCode;
                             }
                             if ( (string) $MarketplaceFacilitator->ChargeType == "MarketplaceFacilitatorTax-Principal") {
                                 $refundEventListData[0]['marketplacefacilitatortaxprincipal'] = (string) $MarketplaceFacilitator->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $MarketplaceFacilitator->ChargeAmount->CurrencyCode;
                             }
                         }
                     }
@@ -573,9 +589,11 @@ class Process_finance_api extends CI_Model
                         $MarketplaceFacilitators = $getRefundEventList->ShipmentItemAdjustmentList->ShipmentItem->ItemTaxWithheldList->TaxWithheldComponent->TaxesWithheld->ChargeComponent->ChargeType;
                         if ( (string) $MarketplaceFacilitators->ChargeType == "MarketplaceFacilitatorTax-Shipping") {
                             $refundEventListData[0]['marketplacefacilitatortaxshipping'] = (string) $MarketplaceFacilitators->ChargeAmount->CurrencyAmount;
+                            $refundCurrency = (string) $MarketplaceFacilitators->ChargeAmount->CurrencyCode;
                         }
                         if ( (string) $MarketplaceFacilitators->ChargeType == "MarketplaceFacilitatorTax-Principal") {
                             $refundEventListData[0]['marketplacefacilitatortaxprincipal'] = (string) $MarketplaceFacilitators->ChargeAmount->CurrencyAmount;
+                            $refundCurrency = (string) $MarketplaceFacilitators->ChargeAmount->CurrencyCode;
                         }
                     }
 
@@ -584,9 +602,11 @@ class Process_finance_api extends CI_Model
                         foreach ($refundShipmentItems as $refundShipmentItem) {
                             if ( (string) $refundShipmentItem->FeeType == "Commission") {
                                 $refundEventListData[0]['commission'] = (string) $refundShipmentItem->FeeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundShipmentItem->FeeAmount->CurrencyCode;
                             }
                             if ( (string) $refundShipmentItem->FeeType == "RefundCommission") {
                                 $refundEventListData[0]['refundcommission'] = (string) $refundShipmentItem->FeeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundShipmentItem->FeeAmount->CurrencyCode;
                             }
                         }
                     }
@@ -612,18 +632,23 @@ class Process_finance_api extends CI_Model
                         foreach ($refundChargeComponents as $refundChargeComponent) {
                             if ( (string) $refundChargeComponent->ChargeType == "Tax") {
                                 $refundEventListData[0]['tax'] = (string) $refundChargeComponent->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundChargeComponent->ChargeAmount->CurrencyCode;
                             }
                             if ( (string) $refundChargeComponent->ChargeType == "Principal") {
                                 $refundEventListData[0]['principal'] = (string) $refundChargeComponent->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundChargeComponent->ChargeAmount->CurrencyCode;
                             }
                             if ( (string) $refundChargeComponent->ChargeType == "ShippingTax") {
                                 $refundEventListData[0]['shippingtax'] = (string) $refundChargeComponent->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundChargeComponent->ChargeAmount->CurrencyCode;
                             }
                             if ( (string) $refundChargeComponent->ChargeType == "ShippingCharge") {
                                 $refundEventListData[0]['shippingcharge'] = (string) $refundChargeComponent->ChargeAmount->CurrencyAmount;
+                                $refundCurrency = (string) $refundChargeComponent->ChargeAmount->CurrencyCode;
                             }
                         }
-                    }                    
+                    }
+                    $refundEventListData[0]['currency'] = $refundCurrency;
                 }
                 // $payload['RefundEventList'] = $refundEventListData;
             }
