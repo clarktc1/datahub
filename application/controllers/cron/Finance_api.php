@@ -84,7 +84,8 @@ class Finance_api extends CI_Controller
                                                                 'totalamount' => $adjustmentEventListValue['totalamount'],
                                                                 'adjustmenttype' => $adjustmentEventListValue['adjustmenttype'],
                                                                 'sellersku' => $adjustmentEventListValue['sellersku'],
-                                                                'added_by' => $usr['profile_id']
+                                                                'dev_date'  => $adjustmentEventListValue['dev_date'],
+                                                                'added_by'  => $usr['profile_id']
                                                             );
                     $checkExits = $this->checkExits('finance_adjustment_event_list', $checkExitsAdjustmentEventArray);
                     if ($checkExits > 0 ) {
@@ -103,7 +104,8 @@ class Finance_api extends CI_Controller
                                                             'orderadjustmentitemid' => $refundEventListValue['orderadjustmentitemid'],
                                                             'sellersku'             => $refundEventListValue['sellersku'],
                                                             'added_by'              => $usr['profile_id'],
-                                                            'amazonorderid'         => $refundEventListValue['amazonorderid']
+                                                            'amazonorderid'         => $refundEventListValue['amazonorderid'],
+                                                            'dev_date'              => $refundEventListValue['dev_date']
                                                         );
                     $checkExits = $this->checkExits('finance_refund_event_list', $checkExitsRefundEventArray);
                     if ($checkExits > 0 ) {
@@ -264,11 +266,13 @@ class Finance_api extends CI_Controller
 
     public function finance_order_data_summary()
     {
+        // Code Start For add finance order data to summary table
         $finance_order_data_update = array();
         $finance_order_data_update['finance_order_data_summary'] = 'y';
         $get_finance_order_data = $this->product_api->get_finance_order_data();
         if (!empty($get_finance_order_data)) {
             foreach ($get_finance_order_data as $finance_order_data) {
+                $financeCurrency = "";
                 $finance_order_data_summary_array = array();
                 $finance_order_data_summary_array["posted_date"]     = $finance_order_data["posted_date"];
                 $finance_order_data_summary_array["Date_in_GMT"]     = $finance_order_data["posted_date_gmt"];
@@ -296,6 +300,7 @@ class Finance_api extends CI_Controller
                         $get_finance_order_item_charge_list_data = $this->product_api->get_finance_order_item_charge_list_data($get_finance_order_item);
                         if (!empty($get_finance_order_item_charge_list_data)) {
                             foreach ($get_finance_order_item_charge_list_data as $get_finance_order_item_charge_list) {
+                                $financeCurrency = $get_finance_order_item_charge_list["currency_code"];
                                 if ($get_finance_order_item_charge_list['charge_type'] == "Principal") {
                                     $product_sales += $get_finance_order_item_charge_list["charge_amount"];
                                 }
@@ -313,6 +318,7 @@ class Finance_api extends CI_Controller
                         $get_finance_order_item_fee_list_data = $this->product_api->get_finance_order_item_fee_list_data($get_finance_order_item);
                         if (!empty($get_finance_order_item_fee_list_data)) {
                             foreach ($get_finance_order_item_fee_list_data as $get_finance_order_item_fee_list) {
+                                $financeCurrency = $get_finance_order_item_fee_list["currency_code"];
                                 if ($get_finance_order_item_fee_list["fee_type"]=="Commission") {
                                     $selling_fees += $get_finance_order_item_fee_list["fee_amount"];
                                 }
@@ -327,6 +333,7 @@ class Finance_api extends CI_Controller
                         $get_finance_order_item_promotion_list_data = $this->product_api->get_finance_order_item_promotion_list_data($get_finance_order_item);
                         if (!empty($get_finance_order_item_promotion_list_data)) {
                             foreach ($get_finance_order_item_promotion_list_data as $get_finance_order_item_promotion_list) {
+                                $financeCurrency = $get_finance_order_item_promotion_list["currency_code"];
                                 if ($get_finance_order_item_promotion_list['promotion_type']=="PromotionMetaDataDefinitionValue") {
                                     $promotional_rebates_total += $get_finance_order_item_promotion_list["promotion_amount"];
                                 }
@@ -335,6 +342,7 @@ class Finance_api extends CI_Controller
                         $get_finance_order_item_tax_withheld_list_data = $this->product_api->get_finance_order_item_tax_withheld_list_data($get_finance_order_item);
                         if (!empty($get_finance_order_item_tax_withheld_list_data)) {
                             foreach ($get_finance_order_item_tax_withheld_list_data as $get_finance_order_item_tax_withheld_list) {
+                                $financeCurrency = $get_finance_order_item_tax_withheld_list['currency_code'];
                                 $total_charge_amount += $get_finance_order_item_tax_withheld_list['charge_amount'];
                             }
                         }
@@ -349,6 +357,7 @@ class Finance_api extends CI_Controller
                     $finance_order_data_summary_array["other_transaction_fees"] = $other_transaction_fees;
                     $finance_order_data_summary_array["promotional_rebates"] = $promotional_rebates_total;
                     $finance_order_data_summary_array["marketplace_facilitator_tax"] = $total_charge_amount;
+                    $finance_order_data_summary_array["currency"] = $financeCurrency;
                     $get_finance_order_data_summary = $this->product_api->get_finance_order_data_summary($finance_order_data);
                     if (!empty($get_finance_order_data_summary)) {
                         $checkUpdate = $this->updatedata('finance_order_data_summary', $finance_order_data_summary_array, array('f_oid' => $get_finance_order_data_summary->f_oid));
@@ -366,6 +375,148 @@ class Finance_api extends CI_Controller
                 }
             }
         }
+        // Code End For add finance order data to summary table
+
+        $changeStatus = array();
+        $changeStatus['finance_order_data_summary'] = 'y';
+
+        // Code Start To adjustment to summary table
+        $get_finance_adjustment_event_list = $this->product_api->get_finance_adjustment_event_list();
+        if (!empty($get_finance_adjustment_event_list)) {
+            foreach ($get_finance_adjustment_event_list as $get_finance_adjustment_event) {
+                $add_finance_adjustment_event_list = array();
+                $add_finance_adjustment_event_list['posted_date']   = $get_finance_adjustment_event['posteddate'];
+                $add_finance_adjustment_event_list['seller_sku']    = $get_finance_adjustment_event['sellersku'];
+                $add_finance_adjustment_event_list['quantity']      = $get_finance_adjustment_event['quantity'];
+                $add_finance_adjustment_event_list['other_transaction_fees'] = $get_finance_adjustment_event['totalamount'];
+                $add_finance_adjustment_event_list['added_by']      = $get_finance_adjustment_event['added_by'];
+                $add_finance_adjustment_event_list['type']          = "adjustment";
+                $add_finance_adjustment_event_list['adjustment_id'] = $get_finance_adjustment_event['id'];
+                $add_finance_adjustment_event_list['currency']      = $get_finance_adjustment_event['currency'];
+                $add_finance_adjustment_event_list['dev_date']      = $get_finance_adjustment_event['dev_date'];
+                $checkExitsAdjustmentEventArrayForSummary = array(
+                                                                    'other_transaction_fees' => $get_finance_adjustment_event['totalamount'],
+                                                                    'seller_sku' => $get_finance_adjustment_event['sellersku'],
+                                                                    'added_by'   => $get_finance_adjustment_event['added_by'],
+                                                                    'type'       => "adjustment",
+                                                                    'dev_date'   => $get_finance_adjustment_event['dev_date'],
+                                                                );
+                $checkExitAdjustmentEvent = checkExitData('finance_order_data_summary', $checkExitsAdjustmentEventArrayForSummary);
+                if (!empty($checkExitAdjustmentEvent)) {
+                    $checkExitAdjustmentEvent = current($checkExitAdjustmentEvent);
+                    $checkUpdate = updatedata('finance_order_data_summary', $add_finance_adjustment_event_list, array('f_oid' => $checkExitAdjustmentEvent['f_oid']));
+                    if ($checkUpdate==1) {
+                        $changeStatus['finance_order_data_summary_id'] = $checkExitAdjustmentEvent['f_oid'];
+                        updatedata('finance_adjustment_event_list', $changeStatus, array('id' => $get_finance_adjustment_event['id']));
+                    }
+                } else {
+                    $checkInsert = insertdata('finance_order_data_summary',$add_finance_adjustment_event_list);
+                    if ($checkInsert==1) {
+                        $insertId = $this->db->insert_id();
+                        $changeStatus['finance_order_data_summary_id'] = $insertId;
+                        updatedata('finance_adjustment_event_list', $changeStatus, array('id' => $get_finance_adjustment_event['id']));
+                    }
+                }
+            }
+        }
+        // Code End To adjustment to summary table
+
+        // Code Start To refund to summary table
+        $get_finance_refund_event_list = $this->product_api->get_finance_refund_event_list();
+        if (!empty($get_finance_refund_event_list)) {
+            foreach ($get_finance_refund_event_list as $get_finance_refund_event) {
+                // echo "<pre>";
+                // print_r($get_finance_refund_event);
+                // die();
+                $add_finance_refund_event_list = array();
+                $add_finance_refund_event_list['posted_date'] = $get_finance_refund_event['posteddate'];
+                $add_finance_refund_event_list['amazon_order_id'] = $get_finance_refund_event['amazonorderid'];
+                $add_finance_refund_event_list['seller_sku']    = $get_finance_refund_event['sellersku'];
+                $add_finance_refund_event_list['quantity']      = $get_finance_refund_event['quantityshipped'];
+                $add_finance_refund_event_list['marketplace']   = $get_finance_refund_event['marketplacename'];
+                $add_finance_refund_event_list['product_sales'] = $get_finance_refund_event['principal'];
+                $add_finance_refund_event_list['shipping_credits']    = $get_finance_refund_event['shippingcharge'];
+                $add_finance_refund_event_list['promotional_rebates'] = $get_finance_refund_event['promotionmetadatadefinitionvalue'];
+                $add_finance_refund_event_list['sales_tax_collected'] = $get_finance_refund_event['tax'];
+                $marketplacefacilitatortaxprincipal = $get_finance_refund_event['marketplacefacilitatortaxprincipal'];
+                if (!is_numeric(trim($get_finance_refund_event['marketplacefacilitatortaxprincipal']))) {
+                    $marketplacefacilitatortaxprincipal = 0;
+                }
+                $marketplacefacilitatortaxshipping = $get_finance_refund_event['marketplacefacilitatortaxshipping'];
+                if (!is_numeric(trim($get_finance_refund_event['marketplacefacilitatortaxshipping']))) {
+                    $marketplacefacilitatortaxshipping = 0;
+                }
+                $add_finance_refund_event_list['marketplace_facilitator_tax'] = ($marketplacefacilitatortaxprincipal+$marketplacefacilitatortaxshipping);
+                $add_finance_refund_event_list['selling_fees'] = $get_finance_refund_event['commission'];
+                $add_finance_refund_event_list['other_transaction_fees'] = $get_finance_refund_event['refundcommission'];
+                $add_finance_refund_event_list['added_by']  = $get_finance_refund_event['added_by'];
+                $add_finance_refund_event_list['type']      = "refund";
+                $add_finance_refund_event_list['dev_date']  = $get_finance_refund_event['dev_date'];
+                $add_finance_refund_event_list['currency']  = $get_finance_refund_event['currency'];
+                $add_finance_refund_event_list['refund_id'] = $get_finance_refund_event['id'];
+                $checkExitsRefundEventArrayForSummary = array(
+                                                                    'amazon_order_id' => $get_finance_refund_event['amazonorderid'],
+                                                                    'seller_sku' => $get_finance_refund_event['sellersku'],
+                                                                    'added_by'   => $get_finance_refund_event['added_by'],
+                                                                    'type'       => "refund",
+                                                                    'dev_date'   => $get_finance_refund_event['dev_date'],
+                                                                );
+                $checkExitRefundEvent = checkExitData('finance_order_data_summary', $checkExitsRefundEventArrayForSummary);
+                if (!empty($checkExitRefundEvent)) {
+                    $checkExitRefundEvent = current($checkExitRefundEvent);
+                    $checkUpdate = updatedata('finance_order_data_summary', $add_finance_refund_event_list, array('f_oid' => $checkExitRefundEvent['f_oid']));
+                    if ($checkUpdate==1) {
+                        $changeStatus['finance_order_data_summary_id'] = $checkExitRefundEvent['f_oid'];
+                        updatedata('finance_refund_event_list', $changeStatus, array('id' => $get_finance_refund_event['id']));
+                    }
+                } else {
+                    $checkInsert = insertdata('finance_order_data_summary',$add_finance_refund_event_list);
+                    if ($checkInsert==1) {
+                        $insertId = $this->db->insert_id();
+                        $changeStatus['finance_order_data_summary_id'] = $insertId;
+                        updatedata('finance_refund_event_list', $changeStatus, array('id' => $get_finance_refund_event['id']));
+                    }
+                }
+            }
+        }
+        // Code End To refund to summary table
+
+        // Code Start To service to summary table
+        $get_finance_service_fee_event_list = $this->product_api->get_finance_service_fee_event_list();
+        if (!empty($get_finance_service_fee_event_list)) {
+            foreach ($get_finance_service_fee_event_list as $get_finance_service_fee_event) {
+                $add_finance_service_fee_event = array();
+                $add_finance_service_fee_event['other_transaction_fees'] = $get_finance_service_fee_event['fee_amount'];
+                $add_finance_service_fee_event['added_by'] = $get_finance_service_fee_event['added_by'];
+                $add_finance_service_fee_event['type']     = "service-fee";
+                $add_finance_service_fee_event['service_fee_id'] = $get_finance_service_fee_event['id'];
+                $add_finance_service_fee_event['currency']    = $get_finance_service_fee_event['currency'];
+                $add_finance_service_fee_event['marketplace'] = $get_finance_service_fee_event['fee_type'];
+                $checkExitServiceFeeEventArrayForSummary = array(
+                                                                    'other_transaction_fees' => $get_finance_service_fee_event['fee_amount'],
+                                                                    'added_by'   => $get_finance_service_fee_event['added_by'],
+                                                                    'type'       => "service-fee",
+                                                                    'marketplace' => $get_finance_service_fee_event['fee_type']
+                                                                );
+                $checkExitServiceFeeEvent = checkExitData('finance_order_data_summary', $checkExitServiceFeeEventArrayForSummary);
+                if (!empty($checkExitServiceFeeEvent)) {
+                    $checkExitServiceFeeEvent = current($checkExitServiceFeeEvent);
+                    $checkUpdate = updatedata('finance_order_data_summary', $add_finance_service_fee_event, array('f_oid' => $checkExitServiceFeeEvent['f_oid']));
+                    if ($checkUpdate==1) {
+                        $changeStatus['finance_order_data_summary_id'] = $checkExitServiceFeeEvent['f_oid'];
+                        updatedata('finance_service_fee_event_list', $changeStatus, array('id' => $get_finance_service_fee_event['id']));
+                    }
+                } else {
+                    $checkInsert = insertdata('finance_order_data_summary',$add_finance_service_fee_event);
+                    if ($checkInsert==1) {
+                        $insertId = $this->db->insert_id();
+                        $changeStatus['finance_order_data_summary_id'] = $insertId;
+                        updatedata('finance_service_fee_event_list', $changeStatus, array('id' => $get_finance_service_fee_event['id']));
+                    }
+                }
+            }
+        }
+        // Code End To service to summary table
     }
 
     /*public function send_error_mail()

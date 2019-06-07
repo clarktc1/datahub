@@ -1274,5 +1274,44 @@ class Process_finance_api extends CI_Model
             return false;
         }
     }
+
+    function get_finance_adjustment_event_list()
+    {
+        $this->db->select('*');
+        $this->db->from('finance_adjustment_event_list');
+        $this->db->where('finance_order_data_summary','n');
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
+    }
+
+    function get_finance_refund_event_list()
+    {
+        $this->db->select('*');
+        $this->db->from('finance_refund_event_list');
+        $this->db->where('finance_order_data_summary','n');
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
+    }
+
+    function get_finance_service_fee_event_list()
+    {
+        $this->db->select('*');
+        $this->db->from('finance_service_fee_event_list');
+        $this->db->where('finance_order_data_summary','n');
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
+    }
 }
 ?>

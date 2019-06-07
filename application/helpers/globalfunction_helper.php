@@ -49,6 +49,22 @@ if (!function_exists('sendEmails')) {
     }
 }
 
+if (!function_exists('checkExitData')) {
+    function checkExitData($table,$where)
+    {
+        $ci = & get_instance();
+        $ci->db->select('*');
+        $ci->db->where($where);
+        $query = $ci->db->get($table);
+        $num = $query->num_rows();
+        $result = array();
+        if ($num > 0) {
+            $result = $query->result_array();
+        }
+        return $result;
+    }
+}
+
 if (!function_exists('checkExits')) {
     function checkExits($table,$where)
     {
