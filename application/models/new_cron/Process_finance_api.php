@@ -94,12 +94,12 @@ class Process_finance_api extends CI_Model
                 if (strtotime($date_now)>strtotime($createDate)) {
                     $dateCreatePostedBefore = date('Y-m-d', strtotime('1 day', strtotime($createDate)));
                     if (strtotime($dateCreatePostedBefore) == strtotime($date_now) ) {
-                        $data['status_text']    = "Date Match and current to max";
+                        $data['status_text']    = "Date Match and current to max 1";
                         return $data;
                     }
                 }
                 if (strtotime($createDate) >= strtotime($date_now) ) {
-                    $data['status_text']    = "Date Match and current to max";
+                    $data['status_text']    = "Date Match and current to max 2";
                     return $data;
                 }
             } else {
@@ -125,6 +125,13 @@ class Process_finance_api extends CI_Model
 
                 // $param['PostedAfter']   = '2019-03-22T00:01:00Z';
                 // $param['PostedBefore']  = '2019-03-26T23:30:00Z';
+            }
+            $currentDate = date('Y-m-d');
+            $currentTime = date('H:i:s');
+            $currentDateTime = $currentDate."T".$currentTime."Z";
+            if (strtotime($currentDateTime)>=strtotime($param['PostedBefore'])) {
+                $data['status_text']    = "Date Match and current to max 3";
+                return $data;
             }
             // echo "<pre>";
             // print_r($data);
@@ -197,7 +204,10 @@ class Process_finance_api extends CI_Model
                 $responseError = array();
                 $responseError['table_name'] = "Api Error finance_order_data";
                 $responseError['user_id']    = $user_id;
-                $responseError['data']       = json_encode($res);
+                $resArrayCreate = (array) $res;
+                $mergeResData = array_merge($param,$resArrayCreate);
+                $responseError['data']       = json_encode($mergeResData);
+                // $responseError['data']       = json_encode($res);
                 $responseError['api_date']   = $data["createDate"];
                 $newKeyLog[] = $responseError;
             }
