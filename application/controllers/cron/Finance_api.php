@@ -2,7 +2,7 @@
 
 class Finance_api extends CI_Controller
 {
-    private $startDate; 
+    private $startDate;
     public function  __construct()
     {
         parent::__construct();

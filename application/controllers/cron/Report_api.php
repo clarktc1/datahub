@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Report_api extends CI_Controller 
+class Report_api extends CI_Controller
 {
     public function  __construct()
     {
@@ -31,7 +31,7 @@ class Report_api extends CI_Controller
         {
             foreach($users as $usr)
             {
-                //sleep(1); 
+                //sleep(1);
                 $this->report_api->set_credentials($usr);
                 $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
             }
@@ -44,12 +44,12 @@ class Report_api extends CI_Controller
         $users=$this->report_api->get_seller_for_process_new($user_id);
         //print_r($users);
         //die();
- 
+
         if(count($users) > 0)
         {
             foreach($users as $usr)
             {
-                //sleep(1); 
+                //sleep(1);
                 $this->report_api->set_credentials($usr);
                 $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
             }
@@ -75,7 +75,7 @@ class Report_api extends CI_Controller
                 if(count($rep)>0)
                 {
                     $this->report_api->set_credentials($usr);
-                    $res=$this->report_api->update_report_request($usr['profile_id'],$rep);     
+                    $res=$this->report_api->update_report_request($usr['profile_id'],$rep);
                     //print_r($res);
                 }
             }
@@ -87,7 +87,7 @@ class Report_api extends CI_Controller
     {
         echo "<pre>";
         send_error_mail();
-        echo "Cron triggered on :".date('Y-m-d H:i:s')."\n";        
+        echo "Cron triggered on :".date('Y-m-d H:i:s')."\n";
         //die();
         try {
             $users=$this->report_api->get_seller_who_have_generated_report($request_id,$user_id);
@@ -176,7 +176,7 @@ class Report_api extends CI_Controller
                         }
                         else
                         {
-                            $this->report_process->process_report_data_for_testing($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);    
+                            $this->report_process->process_report_data_for_testing($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
                         }
                         // print_r($checkDataSave);
                         if (isset($checkDataSave) && $checkDataSave['response'] == 1) {
@@ -225,11 +225,11 @@ class Report_api extends CI_Controller
             {
                 $this->report_api->set_credentials($usr);
                 $rep=$this->report_api->get_seller_completed_report($usr['profile_id']);
-       
+
                 if(count($rep)>0)
                 {
                     $this->report_api->set_credentials($usr);
-                    $res=$this->report_api->update_ack_status($usr['profile_id'],$rep);     
+                    $res=$this->report_api->update_ack_status($usr['profile_id'],$rep);
                 }
             }
         }

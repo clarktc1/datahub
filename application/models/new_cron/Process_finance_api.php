@@ -58,7 +58,7 @@ class Process_finance_api extends CI_Model
         // die();
         try
         {
-            
+
 
             // Code for get 3 month before data Working Fine
             /*$createDate = date('Y-m-d');
@@ -96,7 +96,7 @@ class Process_finance_api extends CI_Model
                     if (strtotime($dateCreatePostedBefore) == strtotime($date_now) ) {
                         $data['status_text']    = "Date Match and current to max";
                         return $data;
-                    }    
+                    }
                 }
                 if (strtotime($createDate) >= strtotime($date_now) ) {
                     $data['status_text']    = "Date Match and current to max";
@@ -152,7 +152,7 @@ class Process_finance_api extends CI_Model
             //$param['PostedAfter']   = date(DateTime::ISO8601, strtotime('-2 hours'));
             // $param['PostedAfter']   = date(DateTime::ISO8601, strtotime('2019-03-01'));
             // $param['PostedBefore']  = date(DateTime::ISO8601, time() - 120);
-            
+
             //$param['MarketplaceId']=$amz_country_code;
             // echo "<pre>";
             // print_r($param);
@@ -187,7 +187,7 @@ class Process_finance_api extends CI_Model
             // $payload['order_id']=$payload['principal']=$payload['tax']=$payload['giftwrap']=$payload['giftwraptax']=$payload['shippingcharge']=$payload['shippingtax']=$payload['fbafee']=$payload['commission']=$payload['fixedclosingfee']=$payload['giftwrapchargeback']=
             // $payload['shippingchargeback']=$payload['variableclosingfee']=$payload['sku']=$payload['itemid']=$payload['marketplace']=$payload['qty']=$payload['posted_date']='';
             // $payload['asin_counts']=-3;
-            // echo "<pre>";            
+            // echo "<pre>";
             // if (isset($res->ListFinancialEventsResult->NextToken) && !empty($res->ListFinancialEventsResult->NextToken)) {
             //     $tokens = $res->ListFinancialEventsResult->NextToken[0];
             // }
@@ -281,7 +281,7 @@ class Process_finance_api extends CI_Model
             // print_r($res->ListFinancialEventsResult->FinancialEvents);
 
             /* Start ServiceFeeEventList Data */
-            
+
             $serviceFeeEventListData = [];
             if (isset($res->ListFinancialEventsResult->FinancialEvents->ServiceFeeEventList->ServiceFeeEvent[0]) || isset($res->ListFinancialEventsByNextTokenResult->FinancialEvents->ServiceFeeEventList->ServiceFeeEvent[0])) {
                 if (isset($res->ListFinancialEventsResult->FinancialEvents->ServiceFeeEventList->ServiceFeeEvent[0])) {
@@ -354,7 +354,7 @@ class Process_finance_api extends CI_Model
             // die();
 
             /* Start Save RefundEventList Data Array */
-            
+
             $refundEventListData = [];
             if (isset($res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent[0]) || isset($res->ListFinancialEventsByNextTokenResult->FinancialEvents->RefundEventList->ShipmentEvent[0])) {
                 if (isset($res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent[0])) {
@@ -393,7 +393,7 @@ class Process_finance_api extends CI_Model
                     $refundEventListData[$refundI]['sellersku']             = (string) $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->SellerSKU;
                     $refundEventListData[$refundI]['dev_date']              = $get_posted_date;
 
-                    
+
                     if (isset($getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->ItemTaxWithheldList->TaxWithheldComponent->TaxesWithheld->ChargeComponent[0])) {
                         $MarketplaceFacilitators = $getRefundEvent->ShipmentItemAdjustmentList->ShipmentItem->ItemTaxWithheldList->TaxWithheldComponent->TaxesWithheld->ChargeComponent;
                         foreach ($MarketplaceFacilitators as $MarketplaceFacilitator) {
@@ -552,7 +552,7 @@ class Process_finance_api extends CI_Model
                     $refundEventListData[0]['orderadjustmentitemid'] = (string) $getRefundEventList->ShipmentItemAdjustmentList->ShipmentItem->OrderAdjustmentItemId;
                     $refundEventListData[0]['quantityshipped']       = (string) $getRefundEventList->ShipmentItemAdjustmentList->ShipmentItem->QuantityShipped;
                     $refundEventListData[0]['sellersku']             = (string) $getRefundEventList->ShipmentItemAdjustmentList->ShipmentItem->SellerSKU;
-                    
+
                     if (isset($getRefundEventList->ShipmentItemAdjustmentList)) {
                         $shipmentItemUseKey = array('ShipmentItem');
                         $checkResponse = $this->checkMwsNewApiKey($getRefundEventList->ShipmentItemAdjustmentList, $shipmentItemUseKey, 'finance_refund_event_list-2', $user_id, $data["createDate"],$refundEventAmazonOrderId);
@@ -958,7 +958,7 @@ class Process_finance_api extends CI_Model
                                 $payload[$i]['shipmentItemList'] = $shipmentItemListsArray;
                             }
                         }
-                    }                    
+                    }
                     $i++;
                 }
             }
@@ -1157,10 +1157,10 @@ class Process_finance_api extends CI_Model
         return $responseStatus;
     }
 
-    function generate_random_strings($length_of_string = 20) 
-    { 
+    function generate_random_strings($length_of_string = 20)
+    {
         $str_result = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-        return substr(str_shuffle($str_result), 0, $length_of_string); 
+        return substr(str_shuffle($str_result), 0, $length_of_string);
     }
 
     function get_finance_order_data()
