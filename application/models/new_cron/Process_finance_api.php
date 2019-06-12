@@ -129,7 +129,7 @@ class Process_finance_api extends CI_Model
             $currentDate = date('Y-m-d');
             $currentTime = date('H:i:s');
             $currentDateTime = $currentDate."T".$currentTime."Z";
-            if (strtotime($currentDateTime)>=strtotime($param['PostedBefore'])) {
+            if (strtotime($currentDateTime)<=strtotime($param['PostedBefore'])) {
                 $data['status_text']    = "Date Match and current to max 3";
                 return $data;
             }
