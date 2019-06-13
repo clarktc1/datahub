@@ -45,6 +45,245 @@ class Finance_api extends CI_Controller
             {
                 $this->product_api->set_credentials($usr);
                 $prod_list=$this->product_api->get_product_to_match($usr['profile_id'],$usr['country_code']);
+                $res = $this->product_api->fetch_product_details($usr['profile_id'],null,null,$usr['country_code']);
+                if ($res['status_code']==0) {
+                    if (isset($res['mwsNewDataLog']) && !empty($res['mwsNewDataLog'])) {
+                        foreach ($res['mwsNewDataLog'] as $mwsNewDataLog) {
+                            insertdata('mws_new_data_log',$mwsNewDataLog);
+                        }
+                    }
+                }
+                // echo "<pre>"; print_r($res);
+                // die;
+                // $this->saveFinanceData($res, $usr);
+                // $responseArray = array();
+                // $responseArray['api'] = "Finances / ListFinancialEvent";
+                // $responseArray['status'] = "Successfully Fetched";
+                // echo "<prE>"; print_r($responseArray); die();
+            }
+        }
+    }
+
+    public function saveFinanceDataByDatabase()
+    {
+        $get_finance_api_data_match_key = array('save_data' => 'n');
+        $get_finance_api_data = checkExitData('finance_data_api', $get_finance_api_data_match_key);
+        if (!empty($get_finance_api_data)) {
+            foreach ($get_finance_api_data as $get_finance_api) {
+                $resDataArray = $this->product_api->fetch_product_details_merge_data($get_finance_api,$get_finance_api['user_id']);
+                $this->saveFinanceDataByDatabaseTable($resDataArray,$get_finance_api);
+            }
+        }
+        $this->rerun_finace_empty();
+        $this->finance_order_data_summary();
+        // send_error_mail();
+    }
+
+    public function saveFinanceDataByDatabaseTable($res,$usr)
+    {
+        if (!empty($res['payload']))
+        {
+            $apiLastDate     = $usr['end_date'];
+            $user_profile_id = $usr['user_id'];
+            $country_code    = $usr['fin_country'];
+            $start_date      = $usr['start_date'];
+            $end_date        = $usr['end_date'];
+            $apiTableId      = $usr['id'];
+            $date_now = date('Y-m-d');
+            $insert   = [];
+            if ($res['payload']['mwsNewDataLog'] && !empty($res['payload']['mwsNewDataLog'])) {
+                foreach ($res['payload']['mwsNewDataLog'] as $mwsNewDataLog) {
+                    $this->insertdata('mws_new_data_log',$mwsNewDataLog);
+                }
+            }
+            if ($res['payload']['AdjustmentEventList'] && !empty($res['payload']['AdjustmentEventList'])) {
+                foreach ($res['payload']['AdjustmentEventList'] as $adjustmentEventListValue) {
+                    $adjustmentEventListValue['fin_country'] = $country_code;
+                    $adjustmentEventListValue['added_by']    = $user_profile_id;
+                    $checkExitsAdjustmentEventArray = array(
+                                                                'totalamount' => $adjustmentEventListValue['totalamount'],
+                                                                'adjustmenttype' => $adjustmentEventListValue['adjustmenttype'],
+                                                                'sellersku' => $adjustmentEventListValue['sellersku'],
+                                                                'dev_date'  => $adjustmentEventListValue['dev_date'],
+                                                                'added_by'  => $user_profile_id
+                                                            );
+                    $checkExits = $this->checkExits('finance_adjustment_event_list', $checkExitsAdjustmentEventArray);
+                    if ($checkExits > 0 ) {
+                        $this->updatedata('finance_adjustment_event_list', $adjustmentEventListValue, $checkExitsAdjustmentEventArray);
+                    } else {
+                        $adjustmentEventListValue['createDate']  = date('Y-m-d H:i:s');
+                        $this->insertdata('finance_adjustment_event_list',$adjustmentEventListValue);
+                    }
+                }
+            }
+            if ($res['payload']['RefundEventList'] && !empty($res['payload']['RefundEventList'])) {
+                foreach ($res['payload']['RefundEventList'] as $refundEventListValue) {
+                    $refundEventListValue['fin_country'] = $country_code;
+                    $refundEventListValue['added_by']    = $user_profile_id;
+                    $checkExitsRefundEventArray = array(
+                                                            'orderadjustmentitemid' => $refundEventListValue['orderadjustmentitemid'],
+                                                            'sellersku'             => $refundEventListValue['sellersku'],
+                                                            'added_by'              => $user_profile_id,
+                                                            'amazonorderid'         => $refundEventListValue['amazonorderid'],
+                                                            'dev_date'              => $refundEventListValue['dev_date']
+                                                        );
+                    $checkExits = $this->checkExits('finance_refund_event_list', $checkExitsRefundEventArray);
+                    if ($checkExits > 0 ) {
+                        $this->updatedata('finance_refund_event_list', $refundEventListValue, $checkExitsRefundEventArray);
+                    } else {
+                        $refundEventListValue['createDate']  = date('Y-m-d H:i:s');
+                        $this->insertdata('finance_refund_event_list',$refundEventListValue);
+                    }
+                }
+            }
+            if ($res['payload']['ServiceFeeEventList'] && !empty($res['payload']['ServiceFeeEventList'])) {
+                foreach ($res['payload']['ServiceFeeEventList'] as $serviceFeeEventListValue) {
+                    $serviceFeeEventListValue['fin_country'] = $country_code;
+                    $serviceFeeEventListValue['added_by']    = $user_profile_id;
+                    $checkExitServiceFeeEventArray = array(
+                                                                'fee_amount' => $serviceFeeEventListValue['fee_amount'],
+                                                                'fee_type'   => $serviceFeeEventListValue['fee_type'],
+                                                                'added_by'   => $user_profile_id
+                                                            );
+                    $checkExits = $this->checkExits('finance_service_fee_event_list', $checkExitServiceFeeEventArray);
+                    if ($checkExits > 0 ) {
+                        $this->updatedata('finance_service_fee_event_list', $serviceFeeEventListValue, $checkExitServiceFeeEventArray);
+                    } else {
+                        $serviceFeeEventListValue['createDate']  = date('Y-m-d H:i:s');
+                        $this->insertdata('finance_service_fee_event_list',$serviceFeeEventListValue);
+                    }
+                }
+            }
+            $checkGetErrorLog = $res['payload']['mwsNewDataLog'];
+            unset($res['payload']['mwsNewDataLog']);
+            unset($res['payload']['ServiceFeeEventList']);
+            unset($res['payload']['RefundEventList']);
+            unset($res['payload']['AdjustmentEventList']);
+            $apiGetDateToData = $start_date." to ".$end_date;
+            if (isset($res['payload'][0]) && !empty($res['payload'][0])) {
+                foreach ($res['payload'] as $key => $value) {
+                    // if ( (isset($value['amazon_order_id']) && trim($value['amazon_order_id']) !='' ) && (isset($value['seller_order_id']) && trim($value['seller_order_id']) !='' ) ) {
+                    if ( isset($value['amazon_order_id']) && trim($value['amazon_order_id']) !='' ) {
+                        $amazon_order_id = $value['amazon_order_id'];
+                        $this->db->delete('finance_order_item_fee_list_data', array('amazon_order_id' => $amazon_order_id, 'dev_date' => $value['dev_date']));
+                        $this->db->delete('finance_order_item_charge_list_data', array('amazon_order_id' => $amazon_order_id, 'dev_date' => $value['dev_date']));
+                        $this->db->delete('finance_order_item_promotion_list_data', array('amazon_order_id' => $amazon_order_id, 'dev_date' => $value['dev_date']));
+                        $this->db->delete('finance_order_item_tax_withheld_list_data', array('amazon_order_id' => $amazon_order_id, 'dev_date' => $value['dev_date']));
+                        $this->db->delete('finance_order_shipment_fee_list', array('amazon_order_id' => $amazon_order_id, 'dev_date' => $value['dev_date']));
+                        $this->db->delete('finance_order_item_data', array('amazon_order_id' => $amazon_order_id, 'dev_date' => $value['dev_date']));
+                        if (isset($value['shipmentItemList']) && !empty($value['shipmentItemList'])) {
+                            foreach ($value['shipmentItemList'] as $shipmentItemList) {
+                                if (isset($shipmentItemList['ItemFeeList']) && !empty($shipmentItemList['ItemFeeList'])) {
+                                    $this->db->insert_batch('finance_order_item_fee_list_data', $shipmentItemList['ItemFeeList']);
+                                }
+                                if (isset($shipmentItemList['ItemChargeList']) && !empty($shipmentItemList['ItemChargeList'])) {
+                                    $this->db->insert_batch('finance_order_item_charge_list_data', $shipmentItemList['ItemChargeList']);
+                                }
+                                if (isset($shipmentItemList['PromotionList']) && !empty($shipmentItemList['PromotionList'])) {
+                                    $this->db->insert_batch('finance_order_item_promotion_list_data', $shipmentItemList['PromotionList']);
+                                }
+                                if (isset($shipmentItemList['ItemTaxWithheldList']) && !empty($shipmentItemList['ItemTaxWithheldList'])) {
+                                    $this->db->insert_batch('finance_order_item_tax_withheld_list_data', $shipmentItemList['ItemTaxWithheldList']);
+                                }
+                                unset($shipmentItemList['ItemFeeList']);
+                                unset($shipmentItemList['ItemChargeList']);
+                                unset($shipmentItemList['PromotionList']);
+                                unset($shipmentItemList['ItemTaxWithheldList']);
+                                $shipmentItemList['fin_country'] = $country_code;
+                                $shipmentItemList['added_by']    = $user_profile_id;
+                                $this->insertdata('finance_order_item_data',$shipmentItemList);
+                            }
+                        }
+
+                        if (isset($value['ShipmentFeeList']) && !empty($value['ShipmentFeeList'])) {
+                            $this->db->insert_batch('finance_order_shipment_fee_list', $value['ShipmentFeeList']);
+                        }
+                        unset($value['ShipmentFeeList']);
+                        unset($value['shipmentItemList']);
+                        // sleep(2);
+                        $value['fin_country'] = $country_code;
+                        $value['added_by']    = $user_profile_id;
+
+                        // $value['extra']    = $user_profile_id;
+
+                        $checkExits = $this->checkExits('finance_order_data',array('amazon_order_id' => $value['amazon_order_id'], 'dev_date' => $value['dev_date']));
+                        if ($checkExits > 0 ) {
+                            $value['finance_order_data_summary'] = 'n';
+                            $checkUpDateFinData = $this->updatedata('finance_order_data', $value, array('amazon_order_id' => $value['amazon_order_id'], 'dev_date' => $value['dev_date']));
+                            if ($checkUpDateFinData) {
+                                $this->updatedata('rep_orders_data_order_date_list',['fee_flag' => 1 ], ['order_id' => $value['amazon_order_id'] ] );
+                                $this->updatedata('finance_data_log',['date' => $apiLastDate ], ['user_id' => $user_profile_id ] );
+                                updatedata('finance_data_api',['save_data' => 'y' ], ['id' => $apiTableId ] );
+                            } else {
+                                $saveErrorData = array();
+                                $saveErrorData['error'] = $this->db->error();
+                                $saveErrorData['error_dates'] = $apiGetDateToData;
+                                $mwsNewDataLogEmpty = array();
+                                $mwsNewDataLogEmpty['table_name'] = "Error Found finance_order_data update Query";
+                                $mwsNewDataLogEmpty['user_id']    = $user_profile_id;
+                                $mwsNewDataLogEmpty['data']       = json_encode($saveErrorData);
+                                $mwsNewDataLogEmpty['api_date']   = $apiLastDate;
+                                $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
+                                // break;
+                            }
+                        } else {
+                            $checkInsertFinData = $this->insertdata('finance_order_data',$value);
+                            if ($checkInsertFinData) {
+                                $this->updatedata('rep_orders_data_order_date_list',['fee_flag' => 1 ], ['order_id' => $value['amazon_order_id'] ] );
+                                $this->updatedata('finance_data_log',['date' => $apiLastDate ], ['user_id' => $user_profile_id ] );
+                                updatedata('finance_data_api',['save_data' => 'y' ], ['id' => $apiTableId ] );
+                            } else {
+                                $saveErrorData = array();
+                                $saveErrorData['error'] = $this->db->error();
+                                $saveErrorData['error_dates'] = $apiGetDateToData;
+                                $mwsNewDataLogEmpty = array();
+                                $mwsNewDataLogEmpty['table_name'] = "Error Found finance_order_data insert Query";
+                                $mwsNewDataLogEmpty['user_id']    = $user_profile_id;
+                                $mwsNewDataLogEmpty['data']       = json_encode($saveErrorData);
+                                $mwsNewDataLogEmpty['api_date']   = $apiLastDate;
+                                $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
+                                // break;
+                            }
+                            // $insert[] = $value;
+                        }
+                    } else {
+                        /*if (strtotime($apiLastDate) < strtotime($date_now) ) {
+                            $createSubmitDate = date('Y-m-d', strtotime('+1 day', strtotime($apiLastDate)));
+                            $this->updatedata('finance_data_log',['date' => $createSubmitDate ], ['user_id' => $user_profile_id ] );
+                        }*/
+                        $this->updatedata('finance_data_log',['date' => $apiLastDate ], ['user_id' => $user_profile_id ] );
+                    }
+                }
+            } else {
+                if (isset($res['payload']) && empty($res['payload'][0])) {
+                    if (empty($checkGetErrorLog)) {
+                        $mwsNewDataLogEmpty = array();
+                        $mwsNewDataLogEmpty['table_name'] = "No Data Found finance_order_data";
+                        $mwsNewDataLogEmpty['user_id']    = $user_profile_id;
+                        $mwsNewDataLogEmpty['data']       = $apiGetDateToData;
+                        $mwsNewDataLogEmpty['api_date']   = $apiLastDate;
+                        $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
+                        $this->updatedata('finance_data_log',['date' => $apiLastDate ], ['user_id' => $user_profile_id ] );
+                    }
+                }
+            }
+        }
+    }
+
+
+    public function product_match_sb_bk($user_id='')
+    {
+        // die("hello dsfsdfds dsfds");
+        $users=$this->product_api->get_seller_for_process();
+        // echo "<pre>";
+        // print_r($users);
+        // die();
+        if(count($users) > 0)
+        {
+            foreach($users as $usr)
+            {
+                $this->product_api->set_credentials($usr);
+                $prod_list=$this->product_api->get_product_to_match($usr['profile_id'],$usr['country_code']);
                 $res=$this->product_api->fetch_product_details($usr['profile_id']);
                 // echo "<pre>"; print_r($res);
                 // die;
@@ -60,7 +299,7 @@ class Finance_api extends CI_Controller
         send_error_mail();
     }
 
-    public function saveFinanceData($res,$usr)
+    public function saveFinanceData_sb_bk($res,$usr)
     {
         // echo "<pre>"; print_r($res);
         // die();
