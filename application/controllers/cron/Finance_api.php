@@ -84,6 +84,7 @@ class Finance_api extends CI_Controller
         if (!empty($res['payload']))
         {
             $apiLastDate     = $usr['end_date'];
+            $apiStartDate    = $usr['start_date'];
             $user_profile_id = $usr['user_id'];
             $country_code    = $usr['fin_country'];
             $start_date      = $usr['start_date'];
@@ -94,6 +95,8 @@ class Finance_api extends CI_Controller
             if ($res['payload']['mwsNewDataLog'] && !empty($res['payload']['mwsNewDataLog'])) {
                 foreach ($res['payload']['mwsNewDataLog'] as $mwsNewDataLog) {
                     $this->insertdata('mws_new_data_log',$mwsNewDataLog);
+                    $this->updatedata('finance_data_log',['date' => $apiStartDate ], ['user_id' => $user_profile_id ] );
+                    updatedata('finance_data_api',['save_data' => 'y' ], ['id' => $apiTableId ] );
                 }
             }
             if ($res['payload']['AdjustmentEventList'] && !empty($res['payload']['AdjustmentEventList'])) {
@@ -252,6 +255,7 @@ class Finance_api extends CI_Controller
                             $this->updatedata('finance_data_log',['date' => $createSubmitDate ], ['user_id' => $user_profile_id ] );
                         }*/
                         $this->updatedata('finance_data_log',['date' => $apiLastDate ], ['user_id' => $user_profile_id ] );
+                        updatedata('finance_data_api',['save_data' => 'y' ], ['id' => $apiTableId ] );
                     }
                 }
             } else {
@@ -264,6 +268,7 @@ class Finance_api extends CI_Controller
                         $mwsNewDataLogEmpty['api_date']   = $apiLastDate;
                         $this->insertdata('mws_new_data_log',$mwsNewDataLogEmpty);
                         $this->updatedata('finance_data_log',['date' => $apiLastDate ], ['user_id' => $user_profile_id ] );
+                        updatedata('finance_data_api',['save_data' => 'y' ], ['id' => $apiTableId ] );
                     }
                 }
             }
