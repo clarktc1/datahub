@@ -66,6 +66,7 @@ class Finance_api extends CI_Controller
 
     public function saveFinanceDataByDatabase()
     {
+        $this->finance_order_data_summary();
         $get_finance_api_data_match_key = array('save_data' => 'n');
         $totalRecord = 5;
         $get_finance_api_data = checkExitData('finance_data_api', $get_finance_api_data_match_key, $totalRecord);
@@ -77,7 +78,7 @@ class Finance_api extends CI_Controller
             }
         }
         $this->rerun_finace_empty();
-        $this->finance_order_data_summary();
+        // $this->finance_order_data_summary();
         // send_error_mail();
     }
 
