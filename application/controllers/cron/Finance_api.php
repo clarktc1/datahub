@@ -67,7 +67,9 @@ class Finance_api extends CI_Controller
     public function saveFinanceDataByDatabase()
     {
         $get_finance_api_data_match_key = array('save_data' => 'n');
-        $get_finance_api_data = checkExitData('finance_data_api', $get_finance_api_data_match_key);
+        $totalRecord = 10;
+        $get_finance_api_data = checkExitData('finance_data_api', $get_finance_api_data_match_key, $totalRecord);
+        // $get_finance_api_data = checkExitData('finance_data_api', $get_finance_api_data_match_key);
         if (!empty($get_finance_api_data)) {
             foreach ($get_finance_api_data as $get_finance_api) {
                 $resDataArray = $this->product_api->fetch_product_details_merge_data($get_finance_api,$get_finance_api['user_id']);

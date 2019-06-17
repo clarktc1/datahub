@@ -50,11 +50,15 @@ if (!function_exists('sendEmails')) {
 }
 
 if (!function_exists('checkExitData')) {
-    function checkExitData($table,$where)
+    function checkExitData($table,$where,$limit=0)
     {
         $ci = & get_instance();
         $ci->db->select('*');
         $ci->db->where($where);
+        if ($limit>0) {
+            $start = 0;
+            $ci->db->limit($limit, $start);
+        }
         $query = $ci->db->get($table);
         $num = $query->num_rows();
         $result = array();
