@@ -49,6 +49,7 @@ class Process_finance_api extends CI_Model
 
     public function fetch_product_details($user_id =null,$order_id =null,$amz_country_code =null,$country_code=null, $token=null, $number = 1)
     {
+        date_default_timezone_set('UTC');
         $data  = array();
         $param = array();
         try
