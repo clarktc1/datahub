@@ -93,6 +93,19 @@ class Process_finance_api extends CI_Model
                 // $data["startDate"]      = $dateCreatePostedAfter;
                 // $data["createDate"]     = $dateCreatePostedBefore;
 
+                $checkExitsFinanceDataApiArray = array(
+                                                        'start_date' => $dateCreatePostedAfter,
+                                                        'end_date'   => $dateCreatePostedBefore,
+                                                        'user_id'    => $user_id,
+                                                        'save_data'  => 'n'
+                                                      );
+                $limitApi = "1";
+                $checkExits = checkExitData('finance_data_api', $checkExitsFinanceDataApiArray, $limitApi);
+                if (!empty($checkExits)) {
+                    $data['status_text']    = "Date Match and current to max 4";
+                    return $data;
+                }
+
                 $this->apiStartDate = $dateCreatePostedAfter;
                 $this->apiEndDate   = $dateCreatePostedBefore;
 
@@ -103,19 +116,6 @@ class Process_finance_api extends CI_Model
                     $data['status_text']    = "Date Match and current to max 3";
                     return $data;
                 }
-            }
-
-            $checkExitsFinanceDataApiArray = array(
-                                                    'start_date' => $this->apiStartDate,
-                                                    'end_date'   => $this->apiEndDate,
-                                                    'user_id'    => $user_id,
-                                                    'save_data'  => 'n'
-                                                  );
-            $limitApi = "1";
-            $checkExits = checkExitData('finance_data_api', $checkExitsFinanceDataApiArray, $limitApi);
-            if (!empty($checkExits)) {
-                $data['status_text']    = "Date Match and current to max 4";
-                return $data;
             }
 
             // $param['AmazonOrderId']='111-4382755-8488200';
