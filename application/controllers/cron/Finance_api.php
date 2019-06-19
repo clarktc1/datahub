@@ -78,6 +78,7 @@ class Finance_api extends CI_Controller
             }
         }
         $this->rerun_finace_empty();
+        $this->finance_data_api_delete_data();
         // $this->finance_order_data_summary();
         // send_error_mail();
     }
@@ -777,6 +778,11 @@ class Finance_api extends CI_Controller
         // Code End To service to summary table
     }
 
+    public function finance_data_api_delete_data()
+    {
+        $matchDeleteArray = array('save_data' => 'y');
+        deletedata('finance_data_api', $matchDeleteArray);
+    }
     /*public function send_error_mail()
     {
         $this->db->select('*');
