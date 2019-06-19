@@ -106,13 +106,22 @@ class Finance_api extends CI_Controller
                 foreach ($res['payload']['AdjustmentEventList'] as $adjustmentEventListValue) {
                     $adjustmentEventListValue['fin_country'] = $country_code;
                     $adjustmentEventListValue['added_by']    = $user_profile_id;
-                    $checkExitsAdjustmentEventArray = array(
-                                                                'totalamount' => $adjustmentEventListValue['totalamount'],
-                                                                'adjustmenttype' => $adjustmentEventListValue['adjustmenttype'],
-                                                                'sellersku' => $adjustmentEventListValue['sellersku'],
-                                                                'dev_date'  => $adjustmentEventListValue['dev_date'],
-                                                                'added_by'  => $user_profile_id
-                                                            );
+                    if (isset($adjustmentEventListValue['totalamount']) && isset($adjustmentEventListValue['sellersku'])) {
+                        $checkExitsAdjustmentEventArray = array(
+                            'totalamount' => $adjustmentEventListValue['totalamount'],
+                            'adjustmenttype' => $adjustmentEventListValue['adjustmenttype'],
+                            'sellersku' => $adjustmentEventListValue['sellersku'],
+                            'dev_date'  => $adjustmentEventListValue['dev_date'],
+                            'added_by'  => $user_profile_id
+                        );
+                    } else {
+                        $checkExitsAdjustmentEventArray = array(
+                            'adjustmenttype' => $adjustmentEventListValue['adjustmenttype'],
+                            'dev_date'  => $adjustmentEventListValue['dev_date'],
+                            'adjustmentamount' => $adjustmentEventListValue['adjustmentamount'],
+                            'added_by'  => $user_profile_id
+                        );
+                    }
                     $checkExits = $this->checkExits('finance_adjustment_event_list', $checkExitsAdjustmentEventArray);
                     if ($checkExits > 0 ) {
                         $this->updatedata('finance_adjustment_event_list', $adjustmentEventListValue, $checkExitsAdjustmentEventArray);
@@ -146,6 +155,7 @@ class Finance_api extends CI_Controller
                 foreach ($res['payload']['ServiceFeeEventList'] as $serviceFeeEventListValue) {
                     $serviceFeeEventListValue['fin_country'] = $country_code;
                     $serviceFeeEventListValue['added_by']    = $user_profile_id;
+                    $serviceFeeEventListValue['ref_date']    = $apiStartDate;
                     $checkExitServiceFeeEventArray = array(
                                                                 'fee_amount' => $serviceFeeEventListValue['fee_amount'],
                                                                 'fee_type'   => $serviceFeeEventListValue['fee_type'],
@@ -738,12 +748,13 @@ class Finance_api extends CI_Controller
                 $add_finance_service_fee_event['type']     = "service-fee";
                 $add_finance_service_fee_event['service_fee_id'] = $get_finance_service_fee_event['id'];
                 $add_finance_service_fee_event['currency']    = $get_finance_service_fee_event['currency'];
-                $add_finance_service_fee_event['marketplace'] = $get_finance_service_fee_event['fee_type'];
+                $add_finance_service_fee_event['fee_type']    = $get_finance_service_fee_event['fee_type'];
+                $add_finance_service_fee_event['posted_date'] = $get_finance_service_fee_event['ref_date'];
                 $checkExitServiceFeeEventArrayForSummary = array(
                                                                     'other_transaction_fees' => $get_finance_service_fee_event['fee_amount'],
                                                                     'added_by'   => $get_finance_service_fee_event['added_by'],
                                                                     'type'       => "service-fee",
-                                                                    'marketplace' => $get_finance_service_fee_event['fee_type']
+                                                                    'fee_type'   => $get_finance_service_fee_event['fee_type']
                                                                 );
                 $checkExitServiceFeeEvent = checkExitData('finance_order_data_summary', $checkExitServiceFeeEventArrayForSummary);
                 if (!empty($checkExitServiceFeeEvent)) {
