@@ -39,27 +39,34 @@ class Finance_api extends CI_Controller
         // echo "<pre>";
         // print_r($users);
         // die();
-        if(count($users) > 0)
-        {
-            foreach($users as $usr)
+        $checkExitsFinanceDataApiArray = array(
+                                                'save_data'  => 'n'
+                                              );
+        $limitApi = "1";
+        $checkExits = checkExitData('finance_data_api', $checkExitsFinanceDataApiArray, $limitApi);
+        if (empty($checkExits)) {
+            if(count($users) > 0)
             {
-                $this->product_api->set_credentials($usr);
-                $prod_list=$this->product_api->get_product_to_match($usr['profile_id'],$usr['country_code']);
-                $res = $this->product_api->fetch_product_details($usr['profile_id'],null,null,$usr['country_code']);
-                if ($res['status_code']==0) {
-                    if (isset($res['mwsNewDataLog']) && !empty($res['mwsNewDataLog'])) {
-                        foreach ($res['mwsNewDataLog'] as $mwsNewDataLog) {
-                            insertdata('mws_new_data_log',$mwsNewDataLog);
+                foreach($users as $usr)
+                {
+                    $this->product_api->set_credentials($usr);
+                    $prod_list=$this->product_api->get_product_to_match($usr['profile_id'],$usr['country_code']);
+                    $res = $this->product_api->fetch_product_details($usr['profile_id'],null,null,$usr['country_code']);
+                    if ($res['status_code']==0) {
+                        if (isset($res['mwsNewDataLog']) && !empty($res['mwsNewDataLog'])) {
+                            foreach ($res['mwsNewDataLog'] as $mwsNewDataLog) {
+                                insertdata('mws_new_data_log',$mwsNewDataLog);
+                            }
                         }
                     }
+                    // echo "<pre>"; print_r($res);
+                    // die;
+                    // $this->saveFinanceData($res, $usr);
+                    // $responseArray = array();
+                    // $responseArray['api'] = "Finances / ListFinancialEvent";
+                    // $responseArray['status'] = "Successfully Fetched";
+                    // echo "<prE>"; print_r($responseArray); die();
                 }
-                // echo "<pre>"; print_r($res);
-                // die;
-                // $this->saveFinanceData($res, $usr);
-                // $responseArray = array();
-                // $responseArray['api'] = "Finances / ListFinancialEvent";
-                // $responseArray['status'] = "Successfully Fetched";
-                // echo "<prE>"; print_r($responseArray); die();
             }
         }
     }

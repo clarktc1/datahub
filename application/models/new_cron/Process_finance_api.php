@@ -165,8 +165,12 @@ class Process_finance_api extends CI_Model
             $finance_data_api_Data['end_date']    = $this->apiEndDate;
             $finance_data_api_Data['insert_date'] = date('Y-m-d H:i:s');
             insertdata('finance_data_api',$finance_data_api_Data);
-            if (isset($res->ListFinancialEventsResult->NextToken) && $res->ListFinancialEventsResult->NextToken!="") {
+            if (isset($res->ListFinancialEventsResult->NextToken) && $res->ListFinancialEventsResult->NextToken!="" && !empty($res->ListFinancialEventsResult->NextToken)) {
                 $getTokens = (string) $res->ListFinancialEventsResult->NextToken;
+                $this->fetch_product_details($user_id,null,null,$country_code,$getTokens);
+            }
+            if (isset($res->ListFinancialEventsByNextTokenResult->NextToken) && $res->ListFinancialEventsByNextTokenResult->NextToken!="" && !empty($res->ListFinancialEventsByNextTokenResult->NextToken)) {
+                $getTokens = (string) $res->ListFinancialEventsByNextTokenResult->NextToken;
                 $this->fetch_product_details($user_id,null,null,$country_code,$getTokens);
             }
             return $data;
