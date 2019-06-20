@@ -2134,7 +2134,7 @@ class Process_finance_api extends CI_Model
         $this->db->select('*');
         $this->db->from('finance_order_data');
         $this->db->where('finance_order_data_summary','n');
-        $limit = 100;
+        $limit = 500;
         $start = 0;
         $this->db->limit($limit, $start);
         $query = $this->db->get();
