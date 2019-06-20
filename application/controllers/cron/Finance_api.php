@@ -702,7 +702,9 @@ class Finance_api extends CI_Controller
                 $add_finance_refund_event_list['marketplace']   = $get_finance_refund_event['marketplacename'];
                 $add_finance_refund_event_list['product_sales'] = $get_finance_refund_event['principal'];
                 $add_finance_refund_event_list['shipping_credits']    = $get_finance_refund_event['shippingcharge'];
-                $add_finance_refund_event_list['promotional_rebates'] = $get_finance_refund_event['promotionmetadatadefinitionvalue'];
+                $promotionmetadatadefinitionvalue_explode = explode(',',$get_finance_refund_event['promotionmetadatadefinitionvalue']);
+                $promotionmetadatadefinitionvalue_sum     = array_sum($promotionmetadatadefinitionvalue_explode);
+                $add_finance_refund_event_list['promotional_rebates'] = $promotionmetadatadefinitionvalue_sum;
                 $add_finance_refund_event_list['sales_tax_collected'] = $get_finance_refund_event['tax'];
                 $marketplacefacilitatortaxprincipal = $get_finance_refund_event['marketplacefacilitatortaxprincipal'];
                 if (!is_numeric(trim($get_finance_refund_event['marketplacefacilitatortaxprincipal']))) {
