@@ -182,3 +182,17 @@ if (!function_exists('send_error_mail')) {
         }
     }
 }
+
+if (!function_exists('get_last_increment_id')) {
+    function get_last_increment_id($tableName="")
+    {
+        if (""!=$tableName) {
+            $ci = & get_instance();
+            $dataBaseName = $ci->db->database;
+            $get_last_increment_id_query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$dataBaseName}' AND TABLE_NAME = '{$tableName}'";
+            $query = $ci->db->query($get_last_increment_id_query);
+            $getId = $query->row();
+            return $getId->AUTO_INCREMENT;
+        }
+    }
+}
