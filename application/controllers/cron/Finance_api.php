@@ -234,7 +234,7 @@ class Finance_api extends CI_Controller
                 }
                 if (!empty($fsfel_bulk_query_data)) {
                     $fsfel_bulk_query_data_implode = implode(',',$fsfel_bulk_query_data);
-                    $fsfel_sql_query = "INSERT INTO `finance_service_fee_event_list` (`fee_amount`, `fee_type`, `currency`, `added_by`, `fin_country`, `ref_date`, `createDate`, `updateDate`)
+                    $fsfel_sql_query = "INSERT INTO `finance_service_fee_event_list` (`fee_amount`, `fee_type`, `currency`, `added_by`, `fin_country`, `ref_date`, `createDate`, `updateDate`, `finance_order_data_summary`)
                                         VALUES
                                         $fsfel_bulk_query_data_implode
                                         ON DUPLICATE KEY
