@@ -73,10 +73,6 @@ class Finance_api extends CI_Controller
 
     public function saveFinanceDataByDatabase()
     {
-        $logData = array();
-        $logData['data'] = "ssssssssssssssssssss";
-        $this->insertdata('logs',$logData);
-        die();
         $this->finance_order_data_summary();
         $this->finance_data_api_delete_data();
         $get_finance_api_data_match_key = array('save_data' => 'n');
