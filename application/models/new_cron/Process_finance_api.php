@@ -359,6 +359,7 @@ class Process_finance_api extends CI_Model
             /* Start Save RefundEventList Data Array */
 
             $refundEventListData = [];
+            $refundCurrency = "USD";
             if (isset($res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent[0]) || isset($res->ListFinancialEventsByNextTokenResult->FinancialEvents->RefundEventList->ShipmentEvent[0])) {
                 if (isset($res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent[0])) {
                     $getRefundEventList = $res->ListFinancialEventsResult->FinancialEvents->RefundEventList->ShipmentEvent;
