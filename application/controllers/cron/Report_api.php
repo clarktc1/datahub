@@ -107,6 +107,11 @@ class Report_api extends CI_Controller
                 {
                     // print_r($usr);
                     // die();
+                    $insertData = array();
+                    $insertData['request_type'] = $usr['request_type'];
+                    $insertData['user_id']      = $usr['user_id'];
+                    $insertData['data']         = "get_report";
+                    $checkInsert = insertdata('test_table',$insertData);
                     $this->report_api->set_credentials($usr);
                     $res=$this->report_api->get_report($usr);
 
