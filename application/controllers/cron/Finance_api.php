@@ -275,7 +275,9 @@ class Finance_api extends CI_Controller
                 $finance_order_shipment_fee_list_delete_amazon_order_id = array();
                 $finance_order_shipment_fee_list_delete_dev_date        = array();
                 $bulk_query_data = array();
+                echo "<pre>";
                 foreach ($res['payload'] as $key => $value) {
+                    print_r($value);
                     if ( isset($value['amazon_order_id']) && trim($value['amazon_order_id']) !='' ) {
                         $amazon_order_id = $value['amazon_order_id'];
                         $delete_amazon_order_id[] = $amazon_order_id;
@@ -304,6 +306,10 @@ class Finance_api extends CI_Controller
                                 $shipmentItemList['added_by']    = $user_profile_id;
                                 $finance_order_item_data_array[] = $shipmentItemList;
                                 if (!empty($finance_order_item_data_array) && count($finance_order_item_data_array)>=15) {
+                                    echo "<br>delete_amazon_order_id => ";
+                                    print_r($delete_amazon_order_id);
+                                    echo "<br>delete_dev_date => ";
+                                    print_r($delete_dev_date);
                                     $delete_tables_names = array(
                                                                     'finance_order_item_fee_list_data',
                                                                     'finance_order_item_charge_list_data',
