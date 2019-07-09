@@ -36,7 +36,7 @@ class Report_api extends CI_Controller
                 $insertData['request_type'] = $report_type;
                 $insertData['user_id']      = $usr['profile_id'];
                 $insertData['data']         = "request_report";
-                $checkInsert = insertdata('test_table',$insertData);
+                insertdata('test_table',$insertData);
                 $this->report_api->set_credentials($usr);
                 $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
             }
@@ -59,7 +59,7 @@ class Report_api extends CI_Controller
                 $insertData['request_type'] = $report_type;
                 $insertData['user_id']      = $usr['profile_id'];
                 $insertData['data']         = "request_report_new";
-                $checkInsert = insertdata('test_table',$insertData);
+                insertdata('test_table',$insertData);
                 $this->report_api->set_credentials($usr);
                 $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
             }
@@ -111,7 +111,7 @@ class Report_api extends CI_Controller
                     $insertData['request_type'] = $usr['request_type'];
                     $insertData['user_id']      = $usr['user_id'];
                     $insertData['data']         = "get_report";
-                    $checkInsert = insertdata('test_table',$insertData);
+                    insertdata('test_table',$insertData);
                     $this->report_api->set_credentials($usr);
                     $res=$this->report_api->get_report($usr);
 
