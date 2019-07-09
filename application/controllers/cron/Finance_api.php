@@ -304,21 +304,19 @@ class Finance_api extends CI_Controller
                                 $shipmentItemList['added_by']    = $user_profile_id;
                                 $finance_order_item_data_array[] = $shipmentItemList;
                                 if (!empty($finance_order_item_data_array) && count($finance_order_item_data_array)>=15) {
-                                    echo "<pre>";
-                                    echo "<br>delete_amazon_order_id => ";
-                                    print_r($delete_amazon_order_id);
-                                    echo "<br>delete_dev_date => ";
-                                    print_r($delete_dev_date);
-                                    $delete_tables_names = array(
-                                                                    'finance_order_item_fee_list_data',
-                                                                    'finance_order_item_charge_list_data',
-                                                                    'finance_order_item_promotion_list_data',
-                                                                    'finance_order_item_tax_withheld_list_data',
-                                                                    'finance_order_item_data'
-                                                                );
-                                    $this->db->where_in('amazon_order_id', $delete_amazon_order_id);
-                                    $this->db->where_in('dev_date', $delete_dev_date);
-                                    $this->db->delete($delete_tables_names);
+                                    if (!empty($delete_amazon_order_id) && !empty($delete_dev_date)) {
+                                        $delete_tables_names = array(
+                                            'finance_order_item_fee_list_data',
+                                            'finance_order_item_charge_list_data',
+                                            'finance_order_item_promotion_list_data',
+                                            'finance_order_item_tax_withheld_list_data',
+                                            'finance_order_item_data'
+                                        );
+                                        $this->db->where_in('amazon_order_id', $delete_amazon_order_id);
+                                        $this->db->where_in('dev_date', $delete_dev_date);
+                                        $this->db->delete($delete_tables_names);
+                                    }
+
                                     if (!empty($finance_order_item_fee_list_data_array)) {
                                         $this->db->insert_batch('finance_order_item_fee_list_data', $finance_order_item_fee_list_data_array);
                                     }
@@ -370,26 +368,30 @@ class Finance_api extends CI_Controller
                 }
 
                 if (!empty($finance_order_shipment_fee_list_array)) {
-                    $delete_tables_names = array(
-                                                    'finance_order_shipment_fee_list'
-                                                );
-                    $this->db->where_in('amazon_order_id', $finance_order_shipment_fee_list_delete_amazon_order_id);
-                    $this->db->where_in('dev_date', $finance_order_shipment_fee_list_delete_dev_date);
-                    $this->db->delete($delete_tables_names);
+                    if (!empty($finance_order_shipment_fee_list_delete_amazon_order_id) && !empty($finance_order_shipment_fee_list_delete_dev_date)) {
+                        $delete_tables_names = array(
+                            'finance_order_shipment_fee_list'
+                        );
+                        $this->db->where_in('amazon_order_id', $finance_order_shipment_fee_list_delete_amazon_order_id);
+                        $this->db->where_in('dev_date', $finance_order_shipment_fee_list_delete_dev_date);
+                        $this->db->delete($delete_tables_names);
+                    }
                     $this->db->insert_batch('finance_order_shipment_fee_list', $finance_order_shipment_fee_list_array);
                 }
 
                 if (!empty($finance_order_item_data_array)) {
-                    $delete_tables_names = array(
-                                                    'finance_order_item_fee_list_data',
-                                                    'finance_order_item_charge_list_data',
-                                                    'finance_order_item_promotion_list_data',
-                                                    'finance_order_item_tax_withheld_list_data',
-                                                    'finance_order_item_data'
-                                                );
-                    $this->db->where_in('amazon_order_id', $delete_amazon_order_id);
-                    $this->db->where_in('dev_date', $delete_dev_date);
-                    $this->db->delete($delete_tables_names);
+                    if (!empty($delete_amazon_order_id) && !empty($delete_dev_date)) {
+                        $delete_tables_names = array(
+                                                        'finance_order_item_fee_list_data',
+                                                        'finance_order_item_charge_list_data',
+                                                        'finance_order_item_promotion_list_data',
+                                                        'finance_order_item_tax_withheld_list_data',
+                                                        'finance_order_item_data'
+                                                    );
+                        $this->db->where_in('amazon_order_id', $delete_amazon_order_id);
+                        $this->db->where_in('dev_date', $delete_dev_date);
+                        $this->db->delete($delete_tables_names);
+                    }
                     if (!empty($finance_order_item_fee_list_data_array)) {
                         $this->db->insert_batch('finance_order_item_fee_list_data', $finance_order_item_fee_list_data_array);
                     }
