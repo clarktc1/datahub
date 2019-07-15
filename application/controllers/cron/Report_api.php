@@ -32,11 +32,11 @@ class Report_api extends CI_Controller
             foreach($users as $usr)
             {
                 //sleep(1);
-                $insertData = array();
+                /* $insertData = array();
                 $insertData['request_type'] = $report_type;
                 $insertData['user_id']      = $usr['profile_id'];
                 $insertData['data']         = "request_report";
-                insertdata('test_table',$insertData);
+                insertdata('test_table',$insertData); */
                 $this->report_api->set_credentials($usr);
                 $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
             }
@@ -55,11 +55,11 @@ class Report_api extends CI_Controller
             foreach($users as $usr)
             {
                 //sleep(1);
-                $insertData = array();
+                /* $insertData = array();
                 $insertData['request_type'] = $report_type;
                 $insertData['user_id']      = $usr['profile_id'];
                 $insertData['data']         = "request_report_new";
-                insertdata('test_table',$insertData);
+                insertdata('test_table',$insertData); */
                 $this->report_api->set_credentials($usr);
                 $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
             }
@@ -107,19 +107,20 @@ class Report_api extends CI_Controller
                 {
                     // print_r($usr);
                     // die();
-                    $insertData = array();
+                    /* $insertData = array();
                     $insertData['request_type'] = $usr['request_type'];
                     $insertData['user_id']      = $usr['user_id'];
                     $insertData['data']         = "get_report";
-                    insertdata('test_table',$insertData);
+                    insertdata('test_table',$insertData); */
                     $this->report_api->set_credentials($usr);
                     $res=$this->report_api->get_report($usr);
 
-                    // $res = array(
-                    //                 "status_code" => 1,
-                    //                 "status_text" => "Success",
-                    //                 "report_file" => "/var/www/html/datahub/asset/amazon_report/1_15780073840018000",
-                    //             );
+                    /* $res = array(
+                                    "status_code" => 1,
+                                    "status_text" => "Success",
+                                    "report_file" => "/var/www/html/datahub/asset/amazon_report/1_15942404993018012",
+                                ); */
+
 
                     if(is_file($res['report_file']))
                     {
@@ -270,5 +271,57 @@ class Report_api extends CI_Controller
         echo "\n";
         echo date('Y-m-d H:i:s',strtotime($dt));
         echo "\n";
+    }
+
+    public function remove_rep_orders_data_order_date_list_duplicate()
+    {
+        $selectId    = "prod_id";
+        $tableName   = "rep_orders_data_order_date_list";
+        $groupByData = "`order_id`, `ord_sku`, `asin`, `user_id`";
+        $coutId      = "prod_id";
+        $deletWhere  = "prod_id";
+        $queryDeleteIdSqlQuery    = "select {$selectId} from {$tableName} group by {$groupByData} having COUNT({$coutId}) > 1  LIMIT 1000";
+        $getQueryDeleteIdSqlQuery = $this->db->query($queryDeleteIdSqlQuery);
+        $checkData = $getQueryDeleteIdSqlQuery->num_rows();
+        $result = array();
+        if ($checkData > 0) {
+            $getQueryDeleteIdSqlData  = $getQueryDeleteIdSqlQuery->result_array();
+            $getDeleteIds = array();
+            foreach ($getQueryDeleteIdSqlData as $getDeleteId) {
+                $getDeleteIds[] = $getDeleteId['prod_id'];
+            }
+            $this->db->where_in($deletWhere, $getDeleteIds);
+            $this->db->delete($tableName);
+            echo "<pre>";
+            print_r($this->db->error());
+        }
+        echo "<bre>";
+        die('Done');
+    }
+
+    public function remove_rep_orders_update_list_duplicate()
+    {
+        $selectId    = "prod_id";
+        $tableName   = "rep_orders_update_list";
+        $groupByData = "`order_id`, `ord_sku`, `asin`, `user_id`";
+        $coutId      = "prod_id";
+        $deletWhere  = "prod_id";
+        $queryDeleteIdSqlQuery    = "select {$selectId} from {$tableName} group by {$groupByData} having COUNT({$coutId}) > 1  LIMIT 1000";
+        $getQueryDeleteIdSqlQuery = $this->db->query($queryDeleteIdSqlQuery);
+        $checkData = $getQueryDeleteIdSqlQuery->num_rows();
+        $result = array();
+        if ($checkData > 0) {
+            $getQueryDeleteIdSqlData  = $getQueryDeleteIdSqlQuery->result_array();
+            $getDeleteIds = array();
+            foreach ($getQueryDeleteIdSqlData as $getDeleteId) {
+                $getDeleteIds[] = $getDeleteId['prod_id'];
+            }
+            $this->db->where_in($deletWhere, $getDeleteIds);
+            $this->db->delete($tableName);
+            echo "<pre>";
+            print_r($this->db->error());
+        }
+        echo "<bre>";
+        die('Done');
     }
 }
