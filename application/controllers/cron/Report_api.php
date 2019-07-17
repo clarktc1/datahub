@@ -96,7 +96,7 @@ class Report_api extends CI_Controller
     public function get_report($request_id='NULL',$user_id='')
     {
         echo "<pre>";
-        send_error_mail();
+        // send_error_mail();
         echo "Cron triggered on :".date('Y-m-d H:i:s')."\n";
         //die();
         try {
