@@ -194,7 +194,7 @@ class Process_report_model extends CI_Model
             $param['MarketplaceIdList.Id.1']=urlencode($this->market_id);
             // $daysPlusForDate = "1 Months";
             $daysPlusForDate = "10 Days";
-            $whereCondition = array('user_id' => $user_id);
+            $whereCondition = array('user_id' => $user_id,'report_type' => $report_type);
             $getUserReportDates = checkExitData('report_date_api',$whereCondition,1);
             if (!empty($getUserReportDates)) {
                 $getUserReportDates = current($getUserReportDates);
@@ -227,7 +227,7 @@ class Process_report_model extends CI_Model
 
                         $req_res = simplexml_load_string($curl_res['payload']);
                         $httpcode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
-                        print_r($httpcode);
+                        // print_r($httpcode);
                         if($httpcode != 200)
                         {
                             throw new Exception($req_res->Error->Message);
@@ -237,7 +237,7 @@ class Process_report_model extends CI_Model
                         $insert_feed_log = array('request_id'=>$request_id,'req_status'=>$status,'user_id'=>$user_id,'request_type'=>$report_type,'market_id'=>$this->market_id);
                         $checkInsertRow  = $this->db->insert('report_feed',$insert_feed_log);
                         if ($checkInsertRow) {
-                            updatedata('report_date_api',['date' => $param['EndDate'] ], ['user_id' => $user_id ] );
+                            updatedata('report_date_api',['date' => $param['EndDate'] ], ['id' => $getUserReportDates['id'], ] );
                         }
                     }
                 }
