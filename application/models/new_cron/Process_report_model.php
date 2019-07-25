@@ -193,7 +193,7 @@ class Process_report_model extends CI_Model
             $param['ReportType']=urlencode($report_type);
             $param['MarketplaceIdList.Id.1']=urlencode($this->market_id);
             // $daysPlusForDate = "1 Months";
-            $daysPlusForDate = "10 Days";
+            $daysPlusForDate = "30 Days";
             $whereCondition = array('user_id' => $user_id,'report_type' => $report_type);
             $getUserReportDates = checkExitData('report_date_api',$whereCondition,1);
             if (!empty($getUserReportDates)) {
