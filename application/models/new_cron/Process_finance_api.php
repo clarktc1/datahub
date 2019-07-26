@@ -88,7 +88,7 @@ class Process_finance_api extends CI_Model
                 }
 
                 $param['Action']        = urlencode("ListFinancialEvents");
-                $param['PostedAfter']   = $dateCreatePostedAfter.'T00:01:00Z';
+                $param['PostedAfter']   = $dateCreatePostedAfter.'T00:00:00Z';
                 $param['PostedBefore']  = $dateCreatePostedBefore.'T23:59:00Z';
                 // $data["startDate"]      = $dateCreatePostedAfter;
                 // $data["createDate"]     = $dateCreatePostedBefore;
@@ -114,6 +114,12 @@ class Process_finance_api extends CI_Model
                 $currentDateTime = $currentDate."T".$currentTime."Z";
                 if (strtotime($currentDateTime)<=strtotime($param['PostedBefore'])) {
                     $data['status_text']    = "Date Match and current to max 3";
+                    return $data;
+                }
+                $date_time_now = date('Y-m-d H:i:s');
+                $checkDateCreatePostedBefore = date("Y-m-d H:i:s", strtotime($param['PostedBefore']));
+                if (strtotime($date_time_now)<=strtotime($checkDateCreatePostedBefore)) {
+                    $data['status_text']    = "Date Match and current to max 8";
                     return $data;
                 }
             }
