@@ -23,45 +23,52 @@ class Report_api extends CI_Controller
 
     public function request_report($report_type='_GET_MERCHANT_LISTINGS_DATA_',$time_from='30',$user_id='')
     {
-        $users=$this->report_api->get_seller_for_process($user_id);
-        //print_r($users);
-        //die();
+        $check_is_processed_column  = array("is_processed" => 0);
+        $check_is_processed         = checkExits('report_feed', $check_is_processed_column);
+        if (empty($check_is_processed) && $check_is_processed==0) {
+            $users=$this->report_api->get_seller_for_process($user_id);
+            //print_r($users);
+            //die();
 
-        if(count($users) > 0)
-        {
-            foreach($users as $usr)
+            if(count($users) > 0)
             {
-                //sleep(1);
-                /* $insertData = array();
-                $insertData['request_type'] = $report_type;
-                $insertData['user_id']      = $usr['profile_id'];
-                $insertData['data']         = "request_report";
-                insertdata('test_table',$insertData); */
-                $this->report_api->set_credentials($usr);
-                $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
+                foreach($users as $usr)
+                {
+                    //sleep(1);
+                    /* $insertData = array();
+                    $insertData['request_type'] = $report_type;
+                    $insertData['user_id']      = $usr['profile_id'];
+                    $insertData['data']         = "request_report";
+                    insertdata('test_table',$insertData); */
+                    $this->report_api->set_credentials($usr);
+                    $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
+                }
             }
         }
     }
 
     public function request_report_new($report_type='_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_',$time_from='30',$user_id='1')
     {
+        $check_is_processed_column  = array("is_processed" => 0);
+        $check_is_processed         = checkExits('report_feed', $check_is_processed_column);
+        if (empty($check_is_processed) && $check_is_processed==0) {
+            $users=$this->report_api->get_seller_for_process_new($user_id);
+            //print_r($users);
+            //die();
 
-        $users=$this->report_api->get_seller_for_process_new($user_id);
-        //print_r($users);
-        //die();
-
-        if(count($users) > 0)
-        {
-            foreach($users as $usr)
+            if(count($users) > 0)
             {
-                //sleep(1);
-                /* $insertData = array();
-                $insertData['request_type'] = $report_type;
-                $insertData['user_id']      = $usr['profile_id'];
-                $insertData['data']         = "request_report_new";
-                insertdata('test_table',$insertData); */
-                $this->report_api->set_credentials($usr);
-                $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
+                foreach($users as $usr)
+                {
+                    //sleep(1);
+                    /* $insertData = array();
+                    $insertData['request_type'] = $report_type;
+                    $insertData['user_id']      = $usr['profile_id'];
+                    $insertData['data']         = "request_report_new";
+                    insertdata('test_table',$insertData); */
+                    $this->report_api->set_credentials($usr);
+                    $res=$this->report_api->request_report($usr['profile_id'],$report_type,$time_from);
+                }
             }
         }
     }

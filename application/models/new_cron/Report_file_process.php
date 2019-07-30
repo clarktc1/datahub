@@ -142,7 +142,7 @@ class Report_file_process extends CI_Model
                     {
                         $insertData = array();
                         foreach ($csvColumnNames as $key => $csvColumnName) {
-                            if (in_array($csvColumnName, $csvColumnNames)) {
+                            if (in_array($csvColumnName, $csvColumnNames) && array_key_exists($csvColumnName,$dataBaseColumnName)) {
                                 $getMatchKey = array_search($csvColumnName, $csvColumnNames);
                                 if (isset($dataBaseColumnName[$csvColumnName])) {
                                     $insertData[$dataBaseColumnName[$csvColumnName]] = $buffer[$getMatchKey];
@@ -478,7 +478,7 @@ public function process_order_update_data($user_id,$report_file,$country,$reques
                     }
                     $insertData = array();
                     foreach ($csvColumnNames as $key => $csvColumnName) {
-                        if (in_array($csvColumnName, $csvColumnNames)) {
+                        if (in_array($csvColumnName, $csvColumnNames) && array_key_exists($csvColumnName,$dataBaseColumnName)) {
                             $getMatchKey = array_search($csvColumnName, $csvColumnNames);
                             if (isset($dataBaseColumnName[$csvColumnName])) {
                                 $insertData[$dataBaseColumnName[$csvColumnName]] = $buffer[$getMatchKey];
@@ -780,7 +780,7 @@ public function process_order_data_by_date($user_id,$report_file,$country,$reque
                     }
                     $insertData = array();
                     foreach ($csvColumnNames as $key => $csvColumnName) {
-                        if (in_array($csvColumnName, $csvColumnNames)) {
+                        if (in_array($csvColumnName, $csvColumnNames) && array_key_exists($csvColumnName,$dataBaseColumnName)) {
                             $getMatchKey = array_search($csvColumnName, $csvColumnNames);
                             if (isset($dataBaseColumnName[$csvColumnName])) {
                                 $insertData[$dataBaseColumnName[$csvColumnName]] = $buffer[$getMatchKey];
@@ -1823,7 +1823,7 @@ public function process_fba_returns_data($user_id,$report_file,$country,$request
 
                     $insertData = array();
                     foreach ($csvColumnNames as $key => $csvColumnName) {
-                        if (in_array($csvColumnName, $csvColumnNames)) {
+                        if (in_array($csvColumnName, $csvColumnNames) && array_key_exists($csvColumnName,$dataBaseColumnName)) {
                             $getMatchKey = array_search($csvColumnName, $csvColumnNames);
                             if (isset($dataBaseColumnName[$csvColumnName])) {
                                 $insertData[$dataBaseColumnName[$csvColumnName]] = $buffer[$getMatchKey];
