@@ -27,6 +27,7 @@ $base_url=base_url();
 	                            <th>Data</th>
 	                            <th>Amazon Order Id</th>
 	                            <th style="min-width: 100px;">Api Date</th>
+                                <th style="min-width: 147px;">Insert Date</th>
 	                        </tr>
 	                    </thead>
 	                    <tbody>
@@ -38,6 +39,7 @@ $base_url=base_url();
 	                                <td><?= $log->data ?></td>
 	                                <td><?= $log->amazon_order_id ?></td>
 	                                <td><?= $log->api_date ?></td>
+                                    <td><?= $log->insert_date ?></td>
 	                            </tr>
 	                        <?php endforeach; ?>
 	                    </tbody>
