@@ -61,7 +61,6 @@ class Process_finance_api extends CI_Model
                 $param['Action']        = urlencode("ListFinancialEventsByNextToken");
                 $param['NextToken']     = $token;
             } else {
-
                 $this->db->select('*');
                 $this->db->from('finance_data_log');
                 $this->db->where('user_id', $user_id);
@@ -72,18 +71,15 @@ class Process_finance_api extends CI_Model
                 $date_check = date('Y-m-d', strtotime('3 day', strtotime($createDate)));
                 if (strtotime($date_check) >= strtotime($date_now) ) {
                     $dateCreatePostedAfter  = $createDate;
-                    $currentDateDiff = date_create($date_now);
-                    $checkDbDateDiff = date_create($createDate);
-                    $diffObj         = date_diff($checkDbDateDiff,$currentDateDiff);
-                    $getDiffNum      = $diffObj->format("%R%a");
-                    if (!is_numeric($getDiffNum) || $getDiffNum<=1) {
-                        $data['status_text']    = "Date Match and current to max 10";
-                        return $data;
+                    if (strtotime($date_now)>strtotime($createDate)) {
+                        $dateCreatePostedBefore = date('Y-m-d', strtotime('1 day', strtotime($createDate)));
+                        if (strtotime($dateCreatePostedBefore) == strtotime($date_now) ) {
+                            $data['status_text']    = "Date Match and current to max 1";
+                            return $data;
+                        }
                     }
-                    $getDiffNum = ($getDiffNum-1);
-                    $dateCreatePostedBefore = date('Y-m-d', strtotime($getDiffNum.' day', strtotime($createDate)));
-                    if (strtotime($date_now)<=strtotime($dateCreatePostedBefore)) {
-                        $data['status_text']    = "Date Match and current to max 10";
+                    if (strtotime($createDate) >= strtotime($date_now) ) {
+                        $data['status_text']    = "Date Match and current to max 2";
                         return $data;
                     }
                 } else {
@@ -93,7 +89,7 @@ class Process_finance_api extends CI_Model
 
                 $param['Action']        = urlencode("ListFinancialEvents");
                 $param['PostedAfter']   = $dateCreatePostedAfter.'T00:00:00Z';
-                $param['PostedBefore']  = $dateCreatePostedBefore.'T23:59:59Z';
+                $param['PostedBefore']  = $dateCreatePostedBefore.'T23:59:00Z';
                 // $data["startDate"]      = $dateCreatePostedAfter;
                 // $data["createDate"]     = $dateCreatePostedBefore;
 
@@ -113,18 +109,21 @@ class Process_finance_api extends CI_Model
                 $this->apiStartDate = $dateCreatePostedAfter;
                 $this->apiEndDate   = $dateCreatePostedBefore;
 
-                $getGmNowDateTime  = gmdate('Y-m-d\TH:i:s\Z');
-                $postedBeforeAddHours = gmdate('Y-m-d\TH:i:s\Z', strtotime("1 hour",strtotime($param['PostedBefore'])));
-                if (strtotime($getGmNowDateTime)<=strtotime($postedBeforeAddHours)) {
-                    $data['status_text']    = "Date Match and current to max 15";
+                $currentDate = date('Y-m-d');
+                $currentTime = date('H:i:s');
+                $currentDateTime = $currentDate."T".$currentTime."Z";
+                if (strtotime($currentDateTime)<=strtotime($param['PostedBefore'])) {
+                    $data['status_text']    = "Date Match and current to max 3";
+                    return $data;
+                }
+                $date_time_now = date('Y-m-d H:i:s');
+                $checkDateCreatePostedBefore = date("Y-m-d H:i:s", strtotime($param['PostedBefore']));
+                if (strtotime($date_time_now)<=strtotime($checkDateCreatePostedBefore)) {
+                    $data['status_text']    = "Date Match and current to max 8";
                     return $data;
                 }
             }
 
-            // echo $user_id;
-            // echo "<pre>";
-            // print_r($param);
-            // die();
             // $param['AmazonOrderId']='111-4382755-8488200';
 
             $curl_res = $this->create_curl_request($param);
