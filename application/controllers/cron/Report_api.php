@@ -24,6 +24,12 @@ class Report_api extends CI_Controller
     public function request_report($report_type='_GET_MERCHANT_LISTINGS_DATA_',$time_from='30',$user_id='')
     {
         $check_is_processed_column  = array("is_processed" => 0);
+        if (""!=trim($report_type)) {
+            $check_is_processed_column['request_type']  = $report_type;
+        }
+        if (""!=trim($user_id)) {
+            $check_is_processed_column['user_id']  = $user_id;
+        }
         $check_is_processed         = checkExits('report_feed', $check_is_processed_column);
         if (empty($check_is_processed) && $check_is_processed==0) {
             $users=$this->report_api->get_seller_for_process($user_id);
