@@ -56,6 +56,12 @@ class Report_api extends CI_Controller
     public function request_report_new($report_type='_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_',$time_from='30',$user_id='1')
     {
         $check_is_processed_column  = array("is_processed" => 0);
+        if (""!=trim($report_type)) {
+            $check_is_processed_column['request_type']  = $report_type;
+        }
+        if (""!=trim($user_id)) {
+            $check_is_processed_column['user_id']  = $user_id;
+        }
         $check_is_processed         = checkExits('report_feed', $check_is_processed_column);
         if (empty($check_is_processed) && $check_is_processed==0) {
             $users=$this->report_api->get_seller_for_process_new($user_id);
