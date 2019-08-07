@@ -2203,21 +2203,45 @@ public function process_fba_inv_health_data($user_id,$report_file,$country,$requ
 }
 
 
-public function process_stranded_inv_ui_data($user_id,$report_file,$country,$request_type)
+public function process_stranded_inv_ui_data($user_id,$report_file,$country,$request_type,$usr=array())
 {
     $responseData = array();
     $responseData['response'] = 1;
     $responseData['msg'] = "";
     $responseData['table_name'] = "stranded_inv_ui_data";
     try {
+        $dataBaseColumnName = array(
+                                        'primary-action'      => 'primary_action',
+                                        'date-stranded'       => 'date_stranded',
+                                        'status-primary'      => 'status_primary',
+                                        'status-secondary'    => 'status_secondary',
+                                        'error-message'       => 'error_msg',
+                                        'stranded-reason'     => 'stranded_reason',
+                                        'asin'                => 'asin',
+                                        'sku'                 => 'sku',
+                                        'fnsku'               => 'fnsku',
+                                        'product-name'        => 'prod_name',
+                                        'condition'           => 'cond',
+                                        'fulfilled-by'        => 'fulfilled_by',
+                                        'fulfillable-qty'     => 'fulfillable_qty',
+                                        'your-price'          => 'your_price',
+                                        'unfulfillable-qty'   => 'unfulfillable_qty',
+                                        'reserved-quantity'   => 'reserved_qty',
+                                        'inbound-shipped-qty' => 'inbound_shipped_qty',
+                                    );
         $fp=fopen($report_file,'r');
         if ($fp)
         {
             $i=0;
+            $csvColumnNames = array();
+            $strandedInvUiDataBulkQueryData = array();
             while(!feof($fp))
             {
                 $buffer = fgetcsv($fp,0,"\t");
-                //print_r($buffer);
+                if ($i===0) {
+                    $csvColumnNames = $buffer;
+                }
+                // print_r($buffer);
                 if($i>=1 && isset($buffer[0]) && !empty(trim($buffer[0])))
                 {
                     if (strpos($buffer[0],"ErrorResponse")) {
@@ -2232,75 +2256,87 @@ public function process_stranded_inv_ui_data($user_id,$report_file,$country,$req
                 }
                 if($i>=1 && !empty($buffer[7]) )
                 {
-                    $primary_action= isset($buffer[0])?$this->db->escape($buffer[0]):'';
-                    $date_stran= isset($buffer[1])?$buffer[1]:'';
-                    $date_stranded=date("Y-m-d", strtotime($date_stran));
-                    //print_r( $date_stran);
-                    //print_r($date_stranded);
-                    //die();
-
-                    $status_primary= isset($buffer[3])?$this->db->escape($buffer[3]):'';
-                    $status_secondary= isset($buffer[4])?$this->db->escape($buffer[4]):'';
-                    $error_msg= isset($buffer[5])?$this->db->escape($buffer[5]):'';
-                    $asin= isset($buffer[7])?$this->db->escape($buffer[7]):'';
-                    $sku= isset($buffer[8])?$this->db->escape($buffer[8]):'';
-                    $fnsku= isset($buffer[9])?$this->db->escape($buffer[9]):'';
-                    $prod_name= isset($buffer[10])?$this->db->escape($buffer[10]):'';
-                    $cond= isset($buffer[11])?$this->db->escape($buffer[11]):'';
-                    $fulfilled_by= isset($buffer[12])?$this->db->escape($buffer[12]):'';
-                    $fulfillable_qty= isset($buffer[13])?$this->db->escape($buffer[13]):'';
-                    $your_price= isset($buffer[14])?$this->db->escape($buffer[14]):'';
-                    $unfulfillable_qty= isset($buffer[15])?$this->db->escape($buffer[15]):'';
-                    $reserved_qty= isset($buffer[16])?$this->db->escape($buffer[16]):'';
-                    $inbound_shipped_qty= isset($buffer[17])?$this->db->escape($buffer[17]):'';
-
-                    $bulk_data[]="(".$primary_action.",'".$date_stranded."',".$status_primary.",".$status_secondary.",".$error_msg.",".$asin.",".$sku.",".$fnsku.",".$prod_name.",".$cond.",".$fulfilled_by.",".$fulfillable_qty.",".$your_price.",".$unfulfillable_qty.",".$reserved_qty.",".$inbound_shipped_qty.",".$user_id.")";
-                }
-
-                if(isset($bulk_data) && count($bulk_data)==500)
-                {
-                    $quer=implode(',',$bulk_data);
-                    $qi="INSERT INTO `stranded_inv_ui_data`(primary_action,date_stranded,status_primary,status_secondary,error_msg,asin,sku,fnsku,prod_name,cond,fulfilled_by,fulfillable_qty,your_price,unfulfillable_qty,reserved_qty,inbound_shipped_qty,user_id)VALUES
-                    $quer
-                    ON DUPLICATE KEY
-                    UPDATE
-                    primary_action=VALUES(primary_action),date_stranded=VALUES(date_stranded),status_primary=VALUES(status_primary),status_secondary=VALUES(status_secondary),error_msg=VALUES(error_msg),asin=VALUES(asin),sku=VALUES(sku),fnsku=VALUES(fnsku),prod_name=VALUES(prod_name),cond=VALUES(cond),fulfilled_by=VALUES(fulfilled_by),fulfillable_qty=VALUES(fulfillable_qty),your_price=VALUES(your_price),unfulfillable_qty=VALUES(unfulfillable_qty),reserved_qty=VALUES(reserved_qty),inbound_shipped_qty=VALUES(inbound_shipped_qty),user_id=VALUES(user_id);";
-                    //print_r($qi);
-                    $checkAddUpdateData = $this->db->query($qi);
-                    if (!$checkAddUpdateData) {
-                        $error = get_instance()->db->error();
-                        $responseData['response'] = 2;
-                        $responseData['msg']      = $error;
-                        $responseData['fileName'] = $report_file;
-                        return $responseData;
-                        break;
+                    $insertData = array();
+                    foreach ($csvColumnNames as $key => $csvColumnName) {
+                        if (in_array($csvColumnName, $csvColumnNames) && array_key_exists($csvColumnName,$dataBaseColumnName)) {
+                            $getMatchKey = array_search($csvColumnName, $csvColumnNames);
+                            if (isset($dataBaseColumnName[$csvColumnName])) {
+                                $insertData[$dataBaseColumnName[$csvColumnName]] = $buffer[$getMatchKey];
+                            }
+                        }
                     }
-                    unset($bulk_data);
-                    unset($quer);
+
+                    if (isset($insertData['date_stranded'])) {
+                        $insertData['date_stranded'] = date("Y-m-d", strtotime($insertData['date_stranded']));
+                    }
+
+                    $siud_primary_action = (isset($insertData["primary_action"]) && "" != trim($insertData["primary_action"])) ? $this->db->escape($insertData["primary_action"]) : $this->db->escape('');
+                    $siud_date_stranded = (isset($insertData["date_stranded"]) && "" != trim($insertData["date_stranded"])) ? $this->db->escape($insertData["date_stranded"]) : $this->db->escape('');
+                    $siud_status_primary = (isset($insertData["status_primary"]) && "" != trim($insertData["status_primary"])) ? $this->db->escape($insertData["status_primary"]) : $this->db->escape('');
+                    $siud_status_secondary = (isset($insertData["status_secondary"]) && "" != trim($insertData["status_secondary"])) ? $this->db->escape($insertData["status_secondary"]) : $this->db->escape('');
+                    $siud_error_msg = (isset($insertData["error_msg"]) && "" != trim($insertData["error_msg"])) ? $this->db->escape($insertData["error_msg"]) : $this->db->escape('');
+                    $siud_stranded_reason = (isset($insertData["stranded_reason"]) && "" != trim($insertData["stranded_reason"])) ? $this->db->escape($insertData["stranded_reason"]) : $this->db->escape('');
+                    $siud_asin = (isset($insertData["asin"]) && "" != trim($insertData["asin"])) ? $this->db->escape($insertData["asin"]) : $this->db->escape('');
+                    $siud_sku = (isset($insertData["sku"]) && "" != trim($insertData["sku"])) ? $this->db->escape($insertData["sku"]) : $this->db->escape('');
+                    $siud_fnsku = (isset($insertData["fnsku"]) && "" != trim($insertData["fnsku"])) ? $this->db->escape($insertData["fnsku"]) : $this->db->escape('');
+                    $siud_prod_name = (isset($insertData["prod_name"]) && "" != trim($insertData["prod_name"])) ? $this->db->escape($insertData["prod_name"]) : $this->db->escape('');
+                    $siud_cond = (isset($insertData["cond"]) && "" != trim($insertData["cond"])) ? $this->db->escape($insertData["cond"]) : $this->db->escape('');
+                    $siud_fulfilled_by = (isset($insertData["fulfilled_by"]) && "" != trim($insertData["fulfilled_by"])) ? $this->db->escape($insertData["fulfilled_by"]) : $this->db->escape('');
+                    $siud_fulfillable_qty = (isset($insertData["fulfillable_qty"]) && "" != trim($insertData["fulfillable_qty"])) ? $this->db->escape($insertData["fulfillable_qty"]) : $this->db->escape('');
+                    $siud_your_price = (isset($insertData["your_price"]) && "" != trim($insertData["your_price"])) ? $this->db->escape($insertData["your_price"]) : $this->db->escape('');
+                    $siud_unfulfillable_qty = (isset($insertData["unfulfillable_qty"]) && "" != trim($insertData["unfulfillable_qty"])) ? $this->db->escape($insertData["unfulfillable_qty"]) : $this->db->escape('');
+                    $siud_reserved_qty = (isset($insertData["reserved_qty"]) && "" != trim($insertData["reserved_qty"])) ? $this->db->escape($insertData["reserved_qty"]) : $this->db->escape('');
+                    $siud_inbound_shipped_qty = (isset($insertData["inbound_shipped_qty"]) && "" != trim($insertData["inbound_shipped_qty"])) ? $this->db->escape($insertData["inbound_shipped_qty"]) : $this->db->escape('');
+                    $siud_user_id = $this->db->escape($user_id);
+                    $siud_report_feed_data = $this->db->escape(json_encode($usr));
+
+                    // print_r($insertData);
+
+                    $strandedInvUiDataBulkQueryData[] = "({$siud_primary_action},{$siud_date_stranded},{$siud_status_primary},{$siud_status_secondary},{$siud_error_msg},{$siud_stranded_reason},{$siud_asin},{$siud_sku},{$siud_fnsku},{$siud_prod_name},{$siud_cond},{$siud_fulfilled_by},{$siud_fulfillable_qty},{$siud_your_price},{$siud_unfulfillable_qty},{$siud_reserved_qty},{$siud_inbound_shipped_qty},{$siud_user_id},{$siud_report_feed_data})";
+
+                    if (!empty($strandedInvUiDataBulkQueryData) && count($strandedInvUiDataBulkQueryData) > 200) {
+                        $strandedInvUiDataBulkQueryData_implode   = implode(',',$strandedInvUiDataBulkQueryData);
+                        $strandedInvUiDataBulkQueryData_sql_query = "INSERT INTO `stranded_inv_ui_data` (`primary_action`, `date_stranded`, `status_primary`, `status_secondary`, `error_msg`, `stranded_reason`, `asin`, `sku`, `fnsku`, `prod_name`, `cond`, `fulfilled_by`, `fulfillable_qty`, `your_price`, `unfulfillable_qty`, `reserved_qty`, `inbound_shipped_qty`, `user_id`, `report_feed_data`)
+                                                                      VALUES
+                                                                      $strandedInvUiDataBulkQueryData_implode
+                                                                      ON DUPLICATE KEY
+                                                                      UPDATE
+                                                                      primary_action=VALUES(primary_action), date_stranded=VALUES(date_stranded), status_primary=VALUES(status_primary), status_secondary=VALUES(status_secondary), error_msg=VALUES(error_msg), stranded_reason=VALUES(stranded_reason), asin=VALUES(asin), sku=VALUES(sku), fnsku=VALUES(fnsku), prod_name=VALUES(prod_name), cond=VALUES(cond), fulfilled_by=VALUES(fulfilled_by), fulfillable_qty=VALUES(fulfillable_qty), your_price=VALUES(your_price), unfulfillable_qty=VALUES(unfulfillable_qty), reserved_qty=VALUES(reserved_qty), inbound_shipped_qty=VALUES(inbound_shipped_qty), user_id=VALUES(user_id), report_feed_data=VALUES(report_feed_data)";
+
+                        $check_strandedInvUiDataBulkQueryData_sql_query = $this->db->query($strandedInvUiDataBulkQueryData_sql_query);
+                        if (!$check_strandedInvUiDataBulkQueryData_sql_query) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
+                        $strandedInvUiDataBulkQueryData = array();
+                    }
                 }
                 $i++;
             }
-            if(isset($bulk_data) && count($bulk_data)<500 && count($bulk_data)>0)
-            {
-                $quer=implode(',',$bulk_data);
-                $qi="INSERT INTO `stranded_inv_ui_data`(primary_action,date_stranded,status_primary,status_secondary,error_msg,asin,sku,fnsku,prod_name,cond,fulfilled_by,fulfillable_qty,your_price,unfulfillable_qty,reserved_qty,inbound_shipped_qty,user_id)VALUES
-                $quer
-                ON DUPLICATE KEY
-                UPDATE
-                primary_action=VALUES(primary_action),date_stranded=VALUES(date_stranded),status_primary=VALUES(status_primary),status_secondary=VALUES(status_secondary),error_msg=VALUES(error_msg),asin=VALUES(asin),sku=VALUES(sku),fnsku=VALUES(fnsku),prod_name=VALUES(prod_name),cond=VALUES(cond),fulfilled_by=VALUES(fulfilled_by),fulfillable_qty=VALUES(fulfillable_qty),your_price=VALUES(your_price),unfulfillable_qty=VALUES(unfulfillable_qty),reserved_qty=VALUES(reserved_qty),inbound_shipped_qty=VALUES(inbound_shipped_qty),user_id=VALUES(user_id);";
+            fclose($fp);
 
-                $checkAddUpdateData = $this->db->query($qi);
-                if (!$checkAddUpdateData) {
-                    $error = get_instance()->db->error();
+            if (!empty($strandedInvUiDataBulkQueryData) && count($strandedInvUiDataBulkQueryData) > 0) {
+                $strandedInvUiDataBulkQueryData_implode   = implode(',',$strandedInvUiDataBulkQueryData);
+                $strandedInvUiDataBulkQueryData_sql_query = "INSERT INTO `stranded_inv_ui_data` (`primary_action`, `date_stranded`, `status_primary`, `status_secondary`, `error_msg`, `stranded_reason`, `asin`, `sku`, `fnsku`, `prod_name`, `cond`, `fulfilled_by`, `fulfillable_qty`, `your_price`, `unfulfillable_qty`, `reserved_qty`, `inbound_shipped_qty`, `user_id`, `report_feed_data`)
+                                                              VALUES
+                                                              $strandedInvUiDataBulkQueryData_implode
+                                                              ON DUPLICATE KEY
+                                                              UPDATE
+                                                              primary_action=VALUES(primary_action), date_stranded=VALUES(date_stranded), status_primary=VALUES(status_primary), status_secondary=VALUES(status_secondary), error_msg=VALUES(error_msg), stranded_reason=VALUES(stranded_reason), asin=VALUES(asin), sku=VALUES(sku), fnsku=VALUES(fnsku), prod_name=VALUES(prod_name), cond=VALUES(cond), fulfilled_by=VALUES(fulfilled_by), fulfillable_qty=VALUES(fulfillable_qty), your_price=VALUES(your_price), unfulfillable_qty=VALUES(unfulfillable_qty), reserved_qty=VALUES(reserved_qty), inbound_shipped_qty=VALUES(inbound_shipped_qty), user_id=VALUES(user_id), report_feed_data=VALUES(report_feed_data)";
+
+                $check_strandedInvUiDataBulkQueryData_sql_query = $this->db->query($strandedInvUiDataBulkQueryData_sql_query);
+                if (!$check_strandedInvUiDataBulkQueryData_sql_query) {
+                    $getError = $this->db->error();
                     $responseData['response'] = 2;
-                    $responseData['msg']      = $error;
+                    $responseData['msg']      = $getError;
                     $responseData['fileName'] = $report_file;
                     return $responseData;
                 }
-                unset($bulk_data);
-                unset($quer);
             }
-            fclose($fp);
         }
         return $responseData;
     } catch(Exception $e) {

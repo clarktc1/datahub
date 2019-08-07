@@ -187,7 +187,7 @@ class Report_api extends CI_Controller
                         }
                         elseif($usr['request_type']=='_GET_STRANDED_INVENTORY_UI_DATA_')
                         {
-                            $checkDataSave = $this->report_process->process_stranded_inv_ui_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                            $checkDataSave = $this->report_process->process_stranded_inv_ui_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type'],$usr);
                         }
                         elseif($usr['request_type']=='_GET_FBA_STORAGE_FEE_CHARGES_DATA_')
                         {
