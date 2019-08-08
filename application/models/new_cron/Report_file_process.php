@@ -2503,21 +2503,38 @@ public function process_fba_storage_fee_data($user_id,$report_file,$country,$req
 
 
 
-public function process_fba_shipment_replacement_data($user_id,$report_file,$country,$request_type)
+public function process_fba_shipment_replacement_data($user_id,$report_file,$country,$request_type,$usr=array())
 {
     $responseData = array();
     $responseData['response'] = 1;
     $responseData['msg'] = "";
     $responseData['table_name'] = "fba_shipment_replacement_data";
     try {
+        $dataBaseColumnName = array(
+                                        'shipment-date'                  => 'shipment_date',
+                                        'sku'                            => 'sku',
+                                        'asin'                           => 'asin',
+                                        'fulfillment-center-id'          => 'fulfillment_center_id',
+                                        'original-fulfillment-center-id' => 'original_fulfillment_center_id',
+                                        'quantity'                       => 'quantity',
+                                        'replacement-reason-code'        => 'replacement_reason_code',
+                                        'replacement-amazon-order-id'    => 'replacement_amazon_order_id',
+                                        'original-amazon-order-id'       => 'original_amazon_order_id'
+                                    );
+
         $fp=fopen($report_file,'r');
         if ($fp)
         {
             $i=0;
+            $csvColumnNames = array();
+            $fba_shipment_replacement_data_bulk_query_data = array();
             while(!feof($fp))
             {
                 $buffer = fgetcsv($fp,0,"\t");
-                //print_r($buffer);
+                if ($i===0) {
+                    $csvColumnNames = $buffer;
+                }
+                // print_r($buffer);
                 if($i>=1 && isset($buffer[0]) && !empty(trim($buffer[0])))
                 {
                     if (strpos($buffer[0],"ErrorResponse")) {
@@ -2532,63 +2549,73 @@ public function process_fba_shipment_replacement_data($user_id,$report_file,$cou
                 }
                 if($i>=1 && !empty($buffer[7]) )
                 {
-                    $shipment_date= isset($buffer[0])?$this->db->escape($buffer[0]):'';
-                    $sku= isset($buffer[1])?$this->db->escape($buffer[1]):'';
-                    $asin= isset($buffer[2])?$this->db->escape($buffer[2]):'';
-                    $fulfillment_center_id= isset($buffer[3])?$this->db->escape($buffer[3]):'';
-                    $original_fulfillment_center_id= isset($buffer[4])?$this->db->escape($buffer[4]):'';
-                    $quantity= isset($buffer[5])?$this->db->escape($buffer[5]):'';
-                    $replacement_reason_code= isset($buffer[6])?$this->db->escape($buffer[6]):'';
-                    $replacement_amazon_order_id= isset($buffer[7])?$this->db->escape($buffer[7]):'';
-                    $original_amazon_order_id= isset($buffer[8])?$this->db->escape($buffer[8]):'';
-                    $bulk_data[]="(".$shipment_date.",".$sku.",".$asin.",".$fulfillment_center_id.",".$original_fulfillment_center_id.",".$quantity.",".$replacement_reason_code.",".$replacement_amazon_order_id.",".$original_amazon_order_id.",".$user_id.")";
-                }
-
-                if(isset($bulk_data) && count($bulk_data)==500)
-                {
-                    $quer=implode(',',$bulk_data);
-                    $qi="INSERT INTO `fba_shipment_replacement_data`(shipment_date,sku,asin,fulfillment_center_id,original_fulfillment_center_id,quantity,replacement_reason_code,replacement_amazon_order_id,original_amazon_order_id,user_id)VALUES
-                    $quer
-                    ON DUPLICATE KEY
-                    UPDATE
-                    shipment_date=VALUES(shipment_date),sku=VALUES(sku),asin=VALUES(asin),fulfillment_center_id=VALUES(fulfillment_center_id),quantity=VALUES(quantity),replacement_reason_code=VALUES(replacement_reason_code),replacement_amazon_order_id=VALUES(replacement_amazon_order_id),original_amazon_order_id=VALUES(original_amazon_order_id),user_id=VALUES(user_id);";
-                    //print_r($qi);
-
-                    $checkAddUpdateData = $this->db->query($qi);
-                    if (!$checkAddUpdateData) {
-                        $error = get_instance()->db->error();
-                        $responseData['response'] = 2;
-                        $responseData['msg']      = $error;
-                        $responseData['fileName'] = $report_file;
-                        return $responseData;
-                        break;
+                    $insertData = array();
+                    foreach ($csvColumnNames as $key => $csvColumnName) {
+                        if (in_array($csvColumnName, $csvColumnNames) && array_key_exists($csvColumnName,$dataBaseColumnName)) {
+                            $getMatchKey = array_search($csvColumnName, $csvColumnNames);
+                            if (isset($dataBaseColumnName[$csvColumnName])) {
+                                $insertData[$dataBaseColumnName[$csvColumnName]] = $buffer[$getMatchKey];
+                            }
+                        }
                     }
-                    unset($bulk_data);
-                    unset($quer);
+
+                    $fsrd_shipment_date               = (isset($insertData["shipment_date"]) && "" != trim($insertData["shipment_date"])) ? $this->db->escape($insertData["shipment_date"]) : $this->db->escape('');
+                    $fsrd_sku                         = (isset($insertData["sku"]) && "" != trim($insertData["sku"])) ? $this->db->escape($insertData["sku"]) : $this->db->escape('');
+                    $fsrd_asin                        = (isset($insertData["asin"]) && "" != trim($insertData["asin"])) ? $this->db->escape($insertData["asin"]) : $this->db->escape('');
+                    $fsrd_fulfillment_center_id       = (isset($insertData["fulfillment_center_id"]) && "" != trim($insertData["fulfillment_center_id"])) ? $this->db->escape($insertData["fulfillment_center_id"]) : $this->db->escape('');
+                    $fsrd_original_fulfillment_center_id = (isset($insertData["original_fulfillment_center_id"]) && "" != trim($insertData["original_fulfillment_center_id"])) ? $this->db->escape($insertData["original_fulfillment_center_id"]) : $this->db->escape('');
+                    $fsrd_quantity                    = (isset($insertData["quantity"]) && "" != trim($insertData["quantity"])) ? $this->db->escape($insertData["quantity"]) : $this->db->escape('');
+                    $fsrd_replacement_reason_code     = (isset($insertData["replacement_reason_code"]) && "" != trim($insertData["replacement_reason_code"])) ? $this->db->escape($insertData["replacement_reason_code"]) : $this->db->escape('');
+                    $fsrd_replacement_amazon_order_id = (isset($insertData["replacement_amazon_order_id"]) && "" != trim($insertData["replacement_amazon_order_id"])) ? $this->db->escape($insertData["replacement_amazon_order_id"]) : $this->db->escape('');
+                    $fsrd_original_amazon_order_id    = (isset($insertData["original_amazon_order_id"]) && "" != trim($insertData["original_amazon_order_id"])) ? $this->db->escape($insertData["original_amazon_order_id"]) : $this->db->escape('');
+                    $fsrd_user_id                     = $this->db->escape($user_id);
+                    $fsrd_report_feed_data            = $this->db->escape(json_encode($usr));
+
+                    $fba_shipment_replacement_data_bulk_query_data[] = "({$fsrd_shipment_date},{$fsrd_sku},{$fsrd_asin},{$fsrd_fulfillment_center_id},{$fsrd_original_fulfillment_center_id},{$fsrd_quantity},{$fsrd_replacement_reason_code},{$fsrd_replacement_amazon_order_id},{$fsrd_original_amazon_order_id},{$fsrd_user_id},{$fsrd_report_feed_data})";
+
+                    if (!empty($fba_shipment_replacement_data_bulk_query_data) && count($fba_shipment_replacement_data_bulk_query_data) > 200) {
+                        $fba_shipment_replacement_data_bulk_query_data_implode = implode(',',$fba_shipment_replacement_data_bulk_query_data);
+                        $fba_estimated_fees_txt_data_sql_query = "INSERT INTO `fba_shipment_replacement_data` (`shipment_date`, `sku`, `asin`, `fulfillment_center_id`, `original_fulfillment_center_id`, `quantity`, `replacement_reason_code`, `replacement_amazon_order_id`, `original_amazon_order_id`, `user_id`, `report_feed_data`)
+                                                                 VALUES
+                                                                 $fba_shipment_replacement_data_bulk_query_data_implode
+                                                                 ON DUPLICATE KEY
+                                                                 UPDATE
+                                                                 shipment_date=VALUES(shipment_date), sku=VALUES(sku), asin=VALUES(asin), fulfillment_center_id=VALUES(fulfillment_center_id), original_fulfillment_center_id=VALUES(original_fulfillment_center_id), quantity=VALUES(quantity), replacement_reason_code=VALUES(replacement_reason_code), replacement_amazon_order_id=VALUES(replacement_amazon_order_id), original_amazon_order_id=VALUES(original_amazon_order_id), user_id=VALUES(user_id), report_feed_data=VALUES(report_feed_data)";
+
+                        $check_fba_estimated_fees_txt_data_sql_query = $this->db->query($fba_estimated_fees_txt_data_sql_query);
+                        if (!$check_fba_estimated_fees_txt_data_sql_query) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
+                        $fba_shipment_replacement_data_bulk_query_data = array();
+                    }
                 }
                 $i++;
             }
-            if(isset($bulk_data) && count($bulk_data)<500 && count($bulk_data)>0)
-            {
-                $quer=implode(',',$bulk_data);
-                $qi="INSERT INTO `fba_shipment_replacement_data`(shipment_date,sku,asin,fulfillment_center_id,original_fulfillment_center_id,quantity,replacement_reason_code,replacement_amazon_order_id,original_amazon_order_id,user_id)VALUES
-                $quer
-                ON DUPLICATE KEY
-                UPDATE
-                shipment_date=VALUES(shipment_date),sku=VALUES(sku),asin=VALUES(asin),fulfillment_center_id=VALUES(fulfillment_center_id),quantity=VALUES(quantity),replacement_reason_code=VALUES(replacement_reason_code),replacement_amazon_order_id=VALUES(replacement_amazon_order_id),original_amazon_order_id=VALUES(original_amazon_order_id),user_id=VALUES(user_id);";
-                //print_r($qi);
-                $checkAddUpdateData = $this->db->query($qi);
-                if (!$checkAddUpdateData) {
-                    $error = get_instance()->db->error();
+            fclose($fp);
+
+            if (!empty($fba_shipment_replacement_data_bulk_query_data) && count($fba_shipment_replacement_data_bulk_query_data) > 0) {
+                $fba_shipment_replacement_data_bulk_query_data_implode = implode(',',$fba_shipment_replacement_data_bulk_query_data);
+                $fba_estimated_fees_txt_data_sql_query = "INSERT INTO `fba_shipment_replacement_data` (`shipment_date`, `sku`, `asin`, `fulfillment_center_id`, `original_fulfillment_center_id`, `quantity`, `replacement_reason_code`, `replacement_amazon_order_id`, `original_amazon_order_id`, `user_id`, `report_feed_data`)
+                                                         VALUES
+                                                         $fba_shipment_replacement_data_bulk_query_data_implode
+                                                         ON DUPLICATE KEY
+                                                         UPDATE
+                                                         shipment_date=VALUES(shipment_date), sku=VALUES(sku), asin=VALUES(asin), fulfillment_center_id=VALUES(fulfillment_center_id), original_fulfillment_center_id=VALUES(original_fulfillment_center_id), quantity=VALUES(quantity), replacement_reason_code=VALUES(replacement_reason_code), replacement_amazon_order_id=VALUES(replacement_amazon_order_id), original_amazon_order_id=VALUES(original_amazon_order_id), user_id=VALUES(user_id), report_feed_data=VALUES(report_feed_data)";
+
+                $check_fba_estimated_fees_txt_data_sql_query = $this->db->query($fba_estimated_fees_txt_data_sql_query);
+                if (!$check_fba_estimated_fees_txt_data_sql_query) {
+                    $getError = $this->db->error();
                     $responseData['response'] = 2;
-                    $responseData['msg']      = $error;
+                    $responseData['msg']      = $getError;
                     $responseData['fileName'] = $report_file;
                     return $responseData;
                 }
-                unset($bulk_data);
-                unset($quer);
             }
-            fclose($fp);
         }
         return $responseData;
     } catch(Exception $e) {

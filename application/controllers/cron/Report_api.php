@@ -195,7 +195,7 @@ class Report_api extends CI_Controller
                         }
                         elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_REPLACEMENT_DATA_')
                         {
-                            $checkDataSave = $this->report_process->process_fba_shipment_replacement_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                            $checkDataSave = $this->report_process->process_fba_shipment_replacement_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type'],$usr);
                         }
                         elseif($usr['request_type']=='_GET_FBA_ESTIMATED_FBA_FEES_TXT_DATA_')
                         {
