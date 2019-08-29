@@ -179,7 +179,7 @@ class Report_api extends CI_Controller
                         }
                         elseif($usr['request_type']=='_GET_RESTOCK_INVENTORY_RECOMMENDATIONS_REPORT_')
                         {
-                            $checkDataSave = $this->report_process->process_restock_inv_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type']);
+                            $checkDataSave = $this->report_process->process_restock_inv_data($usr['profile_id'],$res['report_file'],$usr['country_code'],$usr['request_type'],$usr);
                         }
                         elseif($usr['request_type']=='_GET_FBA_FULFILLMENT_INVENTORY_HEALTH_DATA_')
                         {

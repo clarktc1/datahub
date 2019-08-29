@@ -1913,7 +1913,7 @@ public function process_fba_returns_data($user_id,$report_file,$country,$request
 
 
 
-public function process_restock_inv_data($user_id,$report_file,$country,$request_type)
+public function process_restock_inv_data($user_id,$report_file,$country,$request_type,$usr=array())
 {
     // echo "<pre>";
     $responseData = array();
@@ -2014,17 +2014,18 @@ public function process_restock_inv_data($user_id,$report_file,$country,$request
                     $res_recom_qty     = (isset($insertData["res_recom_qty"]) && "" != trim($insertData["res_recom_qty"])) ? $this->db->escape($insertData["res_recom_qty"]) : $this->db->escape('');
                     $res_recom_order_date = (isset($insertData["res_recom_order_date"]) && "" != trim($insertData["res_recom_order_date"])) ? $this->db->escape($insertData["res_recom_order_date"]) : $this->db->escape('');
                     $res_user_id     = (isset($insertData["res_user_id"]) && "" != trim($insertData["res_user_id"])) ? $this->db->escape($insertData["res_user_id"]) : $this->db->escape('');
+                    $res_report_feed_data = $this->db->escape(json_encode($usr));
 
-                    $rep_restock_inv_data_bulk_query_data[] = "({$res_country},{$res_desc},{$res_fn_sku},{$res_sku},{$res_asin},{$res_cond},{$res_supp},{$res_supp_no},{$res_curr},{$res_price},{$res_sales_30_days},{$res_sales_30_days_units},{$res_total_inv},{$res_inb_inv},{$res_avb_inv},{$res_fc_trans},{$res_fc_process},{$res_cus_order},{$res_unfill},{$res_fulfill},{$res_days_of_sup},{$res_instock_alert},{$res_recom_qty},{$res_recom_order_date},{$res_user_id})";
+                    $rep_restock_inv_data_bulk_query_data[] = "({$res_country},{$res_desc},{$res_fn_sku},{$res_sku},{$res_asin},{$res_cond},{$res_supp},{$res_supp_no},{$res_curr},{$res_price},{$res_sales_30_days},{$res_sales_30_days_units},{$res_total_inv},{$res_inb_inv},{$res_avb_inv},{$res_fc_trans},{$res_fc_process},{$res_cus_order},{$res_unfill},{$res_fulfill},{$res_days_of_sup},{$res_instock_alert},{$res_recom_qty},{$res_recom_order_date},{$res_user_id},{$res_report_feed_data})";
 
                     if (!empty($rep_restock_inv_data_bulk_query_data) && count($rep_restock_inv_data_bulk_query_data) > 200) {
                         $rep_restock_inv_data_bulk_query_data_implode = implode(',',$rep_restock_inv_data_bulk_query_data);
-                        $rep_restock_inv_data_sql_query = "INSERT INTO `rep_restock_inv_data` (`res_country`, `res_desc`, `res_fn_sku`, `res_sku`, `res_asin`, `res_cond`, `res_supp`, `res_supp_no`, `res_curr`, `res_price`, `res_sales_30_days`, `res_sales_30_days_units`, `res_total_inv`, `res_inb_inv`, `res_avb_inv`, `res_fc_trans`, `res_fc_process`, `res_cus_order`, `res_unfill`, `res_fulfill`, `res_days_of_sup`, `res_instock_alert`, `res_recom_qty`, `res_recom_order_date`, `res_user_id`)
+                        $rep_restock_inv_data_sql_query = "INSERT INTO `rep_restock_inv_data` (`res_country`, `res_desc`, `res_fn_sku`, `res_sku`, `res_asin`, `res_cond`, `res_supp`, `res_supp_no`, `res_curr`, `res_price`, `res_sales_30_days`, `res_sales_30_days_units`, `res_total_inv`, `res_inb_inv`, `res_avb_inv`, `res_fc_trans`, `res_fc_process`, `res_cus_order`, `res_unfill`, `res_fulfill`, `res_days_of_sup`, `res_instock_alert`, `res_recom_qty`, `res_recom_order_date`, `res_user_id`, `report_feed_data`)
                                                          VALUES
                                                          $rep_restock_inv_data_bulk_query_data_implode
                                                          ON DUPLICATE KEY
                                                          UPDATE
-                                                         res_country=VALUES(res_country), res_desc=VALUES(res_desc), res_fn_sku=VALUES(res_fn_sku), res_sku=VALUES(res_sku), res_asin=VALUES(res_asin), res_cond=VALUES(res_cond), res_supp=VALUES(res_supp), res_supp_no=VALUES(res_supp_no), res_curr=VALUES(res_curr), res_price=VALUES(res_price), res_sales_30_days=VALUES(res_sales_30_days), res_sales_30_days_units=VALUES(res_sales_30_days_units), res_total_inv=VALUES(res_total_inv), res_inb_inv=VALUES(res_inb_inv), res_avb_inv=VALUES(res_avb_inv), res_fc_trans=VALUES(res_fc_trans), res_fc_process=VALUES(res_fc_process), res_cus_order=VALUES(res_cus_order), res_unfill=VALUES(res_unfill), res_fulfill=VALUES(res_fulfill), res_days_of_sup=VALUES(res_days_of_sup), res_instock_alert=VALUES(res_instock_alert), res_recom_qty=VALUES(res_recom_qty), res_recom_order_date=VALUES(res_recom_order_date), res_user_id=VALUES(res_user_id)";
+                                                         res_country=VALUES(res_country), res_desc=VALUES(res_desc), res_fn_sku=VALUES(res_fn_sku), res_sku=VALUES(res_sku), res_asin=VALUES(res_asin), res_cond=VALUES(res_cond), res_supp=VALUES(res_supp), res_supp_no=VALUES(res_supp_no), res_curr=VALUES(res_curr), res_price=VALUES(res_price), res_sales_30_days=VALUES(res_sales_30_days), res_sales_30_days_units=VALUES(res_sales_30_days_units), res_total_inv=VALUES(res_total_inv), res_inb_inv=VALUES(res_inb_inv), res_avb_inv=VALUES(res_avb_inv), res_fc_trans=VALUES(res_fc_trans), res_fc_process=VALUES(res_fc_process), res_cus_order=VALUES(res_cus_order), res_unfill=VALUES(res_unfill), res_fulfill=VALUES(res_fulfill), res_days_of_sup=VALUES(res_days_of_sup), res_instock_alert=VALUES(res_instock_alert), res_recom_qty=VALUES(res_recom_qty), res_recom_order_date=VALUES(res_recom_order_date), res_user_id=VALUES(res_user_id), report_feed_data=VALUES(report_feed_data)";
 
                         $check_rep_restock_inv_data_sql_query = $this->db->query($rep_restock_inv_data_sql_query);
                         if (!$check_rep_restock_inv_data_sql_query) {
@@ -2035,6 +2036,25 @@ public function process_restock_inv_data($user_id,$report_file,$country,$request
                             return $responseData;
                             break;
                         }
+
+                        $reph_restock_inv_data_sql_query = "INSERT INTO `rep_restock_inv_history` (`res_country`, `res_desc`, `res_fn_sku`, `res_sku`, `res_asin`, `res_cond`, `res_supp`, `res_supp_no`, `res_curr`, `res_price`, `res_sales_30_days`, `res_sales_30_days_units`, `res_total_inv`, `res_inb_inv`, `res_avb_inv`, `res_fc_trans`, `res_fc_process`, `res_cus_order`, `res_unfill`, `res_fulfill`, `res_days_of_sup`, `res_instock_alert`, `res_recom_qty`, `res_recom_order_date`, `res_user_id`, `report_feed_data`)
+                                                         VALUES
+                                                         $rep_restock_inv_data_bulk_query_data_implode
+                                                         ON DUPLICATE KEY
+                                                         UPDATE
+                                                         res_country=VALUES(res_country), res_desc=VALUES(res_desc), res_fn_sku=VALUES(res_fn_sku), res_sku=VALUES(res_sku), res_asin=VALUES(res_asin), res_cond=VALUES(res_cond), res_supp=VALUES(res_supp), res_supp_no=VALUES(res_supp_no), res_curr=VALUES(res_curr), res_price=VALUES(res_price), res_sales_30_days=VALUES(res_sales_30_days), res_sales_30_days_units=VALUES(res_sales_30_days_units), res_total_inv=VALUES(res_total_inv), res_inb_inv=VALUES(res_inb_inv), res_avb_inv=VALUES(res_avb_inv), res_fc_trans=VALUES(res_fc_trans), res_fc_process=VALUES(res_fc_process), res_cus_order=VALUES(res_cus_order), res_unfill=VALUES(res_unfill), res_fulfill=VALUES(res_fulfill), res_days_of_sup=VALUES(res_days_of_sup), res_instock_alert=VALUES(res_instock_alert), res_recom_qty=VALUES(res_recom_qty), res_recom_order_date=VALUES(res_recom_order_date), res_user_id=VALUES(res_user_id), report_feed_data=VALUES(report_feed_data)";
+
+                        $check_reph_restock_inv_data_sql_query = $this->db->query($reph_restock_inv_data_sql_query);
+                        if (!$check_reph_restock_inv_data_sql_query) {
+                            $getError = $this->db->error();
+                            $responseData['table_name'] = "rep_restock_inv_history";
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            return $responseData;
+                            break;
+                        }
+
                         $rep_restock_inv_data_bulk_query_data = array();
                     }
                 }
@@ -2044,16 +2064,33 @@ public function process_restock_inv_data($user_id,$report_file,$country,$request
 
             if (!empty($rep_restock_inv_data_bulk_query_data) && count($rep_restock_inv_data_bulk_query_data) > 0) {
                 $rep_restock_inv_data_bulk_query_data_implode = implode(',',$rep_restock_inv_data_bulk_query_data);
-                $rep_restock_inv_data_sql_query = "INSERT INTO `rep_restock_inv_data` (`res_country`, `res_desc`, `res_fn_sku`, `res_sku`, `res_asin`, `res_cond`, `res_supp`, `res_supp_no`, `res_curr`, `res_price`, `res_sales_30_days`, `res_sales_30_days_units`, `res_total_inv`, `res_inb_inv`, `res_avb_inv`, `res_fc_trans`, `res_fc_process`, `res_cus_order`, `res_unfill`, `res_fulfill`, `res_days_of_sup`, `res_instock_alert`, `res_recom_qty`, `res_recom_order_date`, `res_user_id`)
+                $rep_restock_inv_data_sql_query = "INSERT INTO `rep_restock_inv_data` (`res_country`, `res_desc`, `res_fn_sku`, `res_sku`, `res_asin`, `res_cond`, `res_supp`, `res_supp_no`, `res_curr`, `res_price`, `res_sales_30_days`, `res_sales_30_days_units`, `res_total_inv`, `res_inb_inv`, `res_avb_inv`, `res_fc_trans`, `res_fc_process`, `res_cus_order`, `res_unfill`, `res_fulfill`, `res_days_of_sup`, `res_instock_alert`, `res_recom_qty`, `res_recom_order_date`, `res_user_id`, `report_feed_data`)
                                                  VALUES
                                                  $rep_restock_inv_data_bulk_query_data_implode
                                                  ON DUPLICATE KEY
                                                  UPDATE
-                                                 res_country=VALUES(res_country), res_desc=VALUES(res_desc), res_fn_sku=VALUES(res_fn_sku), res_sku=VALUES(res_sku), res_asin=VALUES(res_asin), res_cond=VALUES(res_cond), res_supp=VALUES(res_supp), res_supp_no=VALUES(res_supp_no), res_curr=VALUES(res_curr), res_price=VALUES(res_price), res_sales_30_days=VALUES(res_sales_30_days), res_sales_30_days_units=VALUES(res_sales_30_days_units), res_total_inv=VALUES(res_total_inv), res_inb_inv=VALUES(res_inb_inv), res_avb_inv=VALUES(res_avb_inv), res_fc_trans=VALUES(res_fc_trans), res_fc_process=VALUES(res_fc_process), res_cus_order=VALUES(res_cus_order), res_unfill=VALUES(res_unfill), res_fulfill=VALUES(res_fulfill), res_days_of_sup=VALUES(res_days_of_sup), res_instock_alert=VALUES(res_instock_alert), res_recom_qty=VALUES(res_recom_qty), res_recom_order_date=VALUES(res_recom_order_date), res_user_id=VALUES(res_user_id)";
+                                                 res_country=VALUES(res_country), res_desc=VALUES(res_desc), res_fn_sku=VALUES(res_fn_sku), res_sku=VALUES(res_sku), res_asin=VALUES(res_asin), res_cond=VALUES(res_cond), res_supp=VALUES(res_supp), res_supp_no=VALUES(res_supp_no), res_curr=VALUES(res_curr), res_price=VALUES(res_price), res_sales_30_days=VALUES(res_sales_30_days), res_sales_30_days_units=VALUES(res_sales_30_days_units), res_total_inv=VALUES(res_total_inv), res_inb_inv=VALUES(res_inb_inv), res_avb_inv=VALUES(res_avb_inv), res_fc_trans=VALUES(res_fc_trans), res_fc_process=VALUES(res_fc_process), res_cus_order=VALUES(res_cus_order), res_unfill=VALUES(res_unfill), res_fulfill=VALUES(res_fulfill), res_days_of_sup=VALUES(res_days_of_sup), res_instock_alert=VALUES(res_instock_alert), res_recom_qty=VALUES(res_recom_qty), res_recom_order_date=VALUES(res_recom_order_date), res_user_id=VALUES(res_user_id), report_feed_data=VALUES(report_feed_data)";
 
                 $check_rep_restock_inv_data_sql_query = $this->db->query($rep_restock_inv_data_sql_query);
                 if (!$check_rep_restock_inv_data_sql_query) {
                     $getError = $this->db->error();
+                    $responseData['response'] = 2;
+                    $responseData['msg']      = $getError;
+                    $responseData['fileName'] = $report_file;
+                    return $responseData;
+                }
+
+                $reph_restock_inv_data_sql_query = "INSERT INTO `rep_restock_inv_history` (`res_country`, `res_desc`, `res_fn_sku`, `res_sku`, `res_asin`, `res_cond`, `res_supp`, `res_supp_no`, `res_curr`, `res_price`, `res_sales_30_days`, `res_sales_30_days_units`, `res_total_inv`, `res_inb_inv`, `res_avb_inv`, `res_fc_trans`, `res_fc_process`, `res_cus_order`, `res_unfill`, `res_fulfill`, `res_days_of_sup`, `res_instock_alert`, `res_recom_qty`, `res_recom_order_date`, `res_user_id`, `report_feed_data`)
+                                                 VALUES
+                                                 $rep_restock_inv_data_bulk_query_data_implode
+                                                 ON DUPLICATE KEY
+                                                 UPDATE
+                                                 res_country=VALUES(res_country), res_desc=VALUES(res_desc), res_fn_sku=VALUES(res_fn_sku), res_sku=VALUES(res_sku), res_asin=VALUES(res_asin), res_cond=VALUES(res_cond), res_supp=VALUES(res_supp), res_supp_no=VALUES(res_supp_no), res_curr=VALUES(res_curr), res_price=VALUES(res_price), res_sales_30_days=VALUES(res_sales_30_days), res_sales_30_days_units=VALUES(res_sales_30_days_units), res_total_inv=VALUES(res_total_inv), res_inb_inv=VALUES(res_inb_inv), res_avb_inv=VALUES(res_avb_inv), res_fc_trans=VALUES(res_fc_trans), res_fc_process=VALUES(res_fc_process), res_cus_order=VALUES(res_cus_order), res_unfill=VALUES(res_unfill), res_fulfill=VALUES(res_fulfill), res_days_of_sup=VALUES(res_days_of_sup), res_instock_alert=VALUES(res_instock_alert), res_recom_qty=VALUES(res_recom_qty), res_recom_order_date=VALUES(res_recom_order_date), res_user_id=VALUES(res_user_id), report_feed_data=VALUES(report_feed_data)";
+
+                $check_reph_restock_inv_data_sql_query = $this->db->query($reph_restock_inv_data_sql_query);
+                if (!$check_reph_restock_inv_data_sql_query) {
+                    $getError = $this->db->error();
+                    $responseData['table_name'] = "rep_restock_inv_history";
                     $responseData['response'] = 2;
                     $responseData['msg']      = $getError;
                     $responseData['fileName'] = $report_file;
