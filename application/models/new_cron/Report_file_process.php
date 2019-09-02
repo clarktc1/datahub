@@ -2820,7 +2820,7 @@ public function process_fba_estimated_fees_txt_data($user_id,$report_file,$count
                             return $responseData;
                             break;
                         }
-                        $fbah_estimated_fees_txt_data_sql_query = "INSERT INTO `fba_estimated_fees_txt_data_history` (`sku`, `fnsku`, `asin`, `product_name`, `product_group`, `brand`, `fulfilled_by`, `your_price`, `sales_price`, `longest_side`, `median_side`, `shortest_side`, `length_and_girth`, `unit_of_dimension`, `item_package_weight`, `unit_of_weight`, `product_size_tier`, `currency`, `estimated_fee_total`, `estimated_referral_fee_per_unit`, `estimated_variable_closing_fee`, `estimated_order_handling_fee_per_order`, `estimated_pick_pack_fee_per_unit`, `estimated_weight_handling_fee_per_unit`, `expected_fulfillment_fee_per_unit`, `estimated_future_fee`, `estimated_future_order_handling_fee_per_order`, `estimated_future_pick_pack_fee_per_unit`, `estimated_future_weight_handling_fee_per_unit`, `expected_future_fulfillment_fee_per_unit`, `has_local_inventory`, `expected_efn_fulfilment_fee_per_unit_uk`, `expected_efn_fulfilment_fee_per_unit_de`, `expected_efn_fulfilment_fee_per_unit_fr`, `expected_efn_fulfilment_fee_per_unit_it`, `expected_efn_fulfilment_fee_per_unit_es`, `user_id`, `report_feed_data`)
+                        $fbah_estimated_fees_txt_data_sql_query = "INSERT INTO `fba_estimated_fees_txt_history` (`sku`, `fnsku`, `asin`, `product_name`, `product_group`, `brand`, `fulfilled_by`, `your_price`, `sales_price`, `longest_side`, `median_side`, `shortest_side`, `length_and_girth`, `unit_of_dimension`, `item_package_weight`, `unit_of_weight`, `product_size_tier`, `currency`, `estimated_fee_total`, `estimated_referral_fee_per_unit`, `estimated_variable_closing_fee`, `estimated_order_handling_fee_per_order`, `estimated_pick_pack_fee_per_unit`, `estimated_weight_handling_fee_per_unit`, `expected_fulfillment_fee_per_unit`, `estimated_future_fee`, `estimated_future_order_handling_fee_per_order`, `estimated_future_pick_pack_fee_per_unit`, `estimated_future_weight_handling_fee_per_unit`, `expected_future_fulfillment_fee_per_unit`, `has_local_inventory`, `expected_efn_fulfilment_fee_per_unit_uk`, `expected_efn_fulfilment_fee_per_unit_de`, `expected_efn_fulfilment_fee_per_unit_fr`, `expected_efn_fulfilment_fee_per_unit_it`, `expected_efn_fulfilment_fee_per_unit_es`, `user_id`, `report_feed_data`)
                                                          VALUES
                                                          $fba_estimated_fees_txt_data_bulk_query_data_implode
                                                          ON DUPLICATE KEY
@@ -2833,7 +2833,7 @@ public function process_fba_estimated_fees_txt_data($user_id,$report_file,$count
                             $responseData['response'] = 2;
                             $responseData['msg']      = $getError;
                             $responseData['fileName'] = $report_file;
-                            $responseData['table_name'] = "fba_estimated_fees_txt_data_history";
+                            $responseData['table_name'] = "fba_estimated_fees_txt_history";
                             return $responseData;
                             break;
                         }
@@ -2861,7 +2861,7 @@ public function process_fba_estimated_fees_txt_data($user_id,$report_file,$count
                     $responseData['fileName'] = $report_file;
                     return $responseData;
                 }
-                $fbah_estimated_fees_txt_data_sql_query = "INSERT INTO `fba_estimated_fees_txt_data_history` (`sku`, `fnsku`, `asin`, `product_name`, `product_group`, `brand`, `fulfilled_by`, `your_price`, `sales_price`, `longest_side`, `median_side`, `shortest_side`, `length_and_girth`, `unit_of_dimension`, `item_package_weight`, `unit_of_weight`, `product_size_tier`, `currency`, `estimated_fee_total`, `estimated_referral_fee_per_unit`, `estimated_variable_closing_fee`, `estimated_order_handling_fee_per_order`, `estimated_pick_pack_fee_per_unit`, `estimated_weight_handling_fee_per_unit`, `expected_fulfillment_fee_per_unit`, `estimated_future_fee`, `estimated_future_order_handling_fee_per_order`, `estimated_future_pick_pack_fee_per_unit`, `estimated_future_weight_handling_fee_per_unit`, `expected_future_fulfillment_fee_per_unit`, `has_local_inventory`, `expected_efn_fulfilment_fee_per_unit_uk`, `expected_efn_fulfilment_fee_per_unit_de`, `expected_efn_fulfilment_fee_per_unit_fr`, `expected_efn_fulfilment_fee_per_unit_it`, `expected_efn_fulfilment_fee_per_unit_es`, `user_id`, `report_feed_data`)
+                $fbah_estimated_fees_txt_data_sql_query = "INSERT INTO `fba_estimated_fees_txt_history` (`sku`, `fnsku`, `asin`, `product_name`, `product_group`, `brand`, `fulfilled_by`, `your_price`, `sales_price`, `longest_side`, `median_side`, `shortest_side`, `length_and_girth`, `unit_of_dimension`, `item_package_weight`, `unit_of_weight`, `product_size_tier`, `currency`, `estimated_fee_total`, `estimated_referral_fee_per_unit`, `estimated_variable_closing_fee`, `estimated_order_handling_fee_per_order`, `estimated_pick_pack_fee_per_unit`, `estimated_weight_handling_fee_per_unit`, `expected_fulfillment_fee_per_unit`, `estimated_future_fee`, `estimated_future_order_handling_fee_per_order`, `estimated_future_pick_pack_fee_per_unit`, `estimated_future_weight_handling_fee_per_unit`, `expected_future_fulfillment_fee_per_unit`, `has_local_inventory`, `expected_efn_fulfilment_fee_per_unit_uk`, `expected_efn_fulfilment_fee_per_unit_de`, `expected_efn_fulfilment_fee_per_unit_fr`, `expected_efn_fulfilment_fee_per_unit_it`, `expected_efn_fulfilment_fee_per_unit_es`, `user_id`, `report_feed_data`)
                                                  VALUES
                                                  $fba_estimated_fees_txt_data_bulk_query_data_implode
                                                  ON DUPLICATE KEY
@@ -2874,7 +2874,7 @@ public function process_fba_estimated_fees_txt_data($user_id,$report_file,$count
                     $responseData['response'] = 2;
                     $responseData['msg']      = $getError;
                     $responseData['fileName'] = $report_file;
-                    $responseData['table_name'] = "fba_estimated_fees_txt_data_history";
+                    $responseData['table_name'] = "fba_estimated_fees_txt_history";
                     return $responseData;
                 }
             }
