@@ -2820,6 +2820,23 @@ public function process_fba_estimated_fees_txt_data($user_id,$report_file,$count
                             return $responseData;
                             break;
                         }
+                        $fbah_estimated_fees_txt_data_sql_query = "INSERT INTO `fba_estimated_fees_txt_data_history` (`sku`, `fnsku`, `asin`, `product_name`, `product_group`, `brand`, `fulfilled_by`, `your_price`, `sales_price`, `longest_side`, `median_side`, `shortest_side`, `length_and_girth`, `unit_of_dimension`, `item_package_weight`, `unit_of_weight`, `product_size_tier`, `currency`, `estimated_fee_total`, `estimated_referral_fee_per_unit`, `estimated_variable_closing_fee`, `estimated_order_handling_fee_per_order`, `estimated_pick_pack_fee_per_unit`, `estimated_weight_handling_fee_per_unit`, `expected_fulfillment_fee_per_unit`, `estimated_future_fee`, `estimated_future_order_handling_fee_per_order`, `estimated_future_pick_pack_fee_per_unit`, `estimated_future_weight_handling_fee_per_unit`, `expected_future_fulfillment_fee_per_unit`, `has_local_inventory`, `expected_efn_fulfilment_fee_per_unit_uk`, `expected_efn_fulfilment_fee_per_unit_de`, `expected_efn_fulfilment_fee_per_unit_fr`, `expected_efn_fulfilment_fee_per_unit_it`, `expected_efn_fulfilment_fee_per_unit_es`, `user_id`, `report_feed_data`)
+                                                         VALUES
+                                                         $fba_estimated_fees_txt_data_bulk_query_data_implode
+                                                         ON DUPLICATE KEY
+                                                         UPDATE
+                                                         sku=VALUES(sku), fnsku=VALUES(fnsku), asin=VALUES(asin), product_name=VALUES(product_name), product_group=VALUES(product_group), brand=VALUES(brand), fulfilled_by=VALUES(fulfilled_by), your_price=VALUES(your_price), sales_price=VALUES(sales_price), longest_side=VALUES(longest_side), median_side=VALUES(median_side), shortest_side=VALUES(shortest_side), length_and_girth=VALUES(length_and_girth), unit_of_dimension=VALUES(unit_of_dimension), item_package_weight=VALUES(item_package_weight), unit_of_weight=VALUES(unit_of_weight), product_size_tier=VALUES(product_size_tier), currency=VALUES(currency), estimated_fee_total=VALUES(estimated_fee_total), estimated_referral_fee_per_unit=VALUES(estimated_referral_fee_per_unit), estimated_variable_closing_fee=VALUES(estimated_variable_closing_fee), estimated_order_handling_fee_per_order=VALUES(estimated_order_handling_fee_per_order), estimated_pick_pack_fee_per_unit=VALUES(estimated_pick_pack_fee_per_unit), estimated_weight_handling_fee_per_unit=VALUES(estimated_weight_handling_fee_per_unit), expected_fulfillment_fee_per_unit=VALUES(expected_fulfillment_fee_per_unit), estimated_future_fee=VALUES(estimated_future_fee), estimated_future_order_handling_fee_per_order=VALUES(estimated_future_order_handling_fee_per_order), estimated_future_pick_pack_fee_per_unit=VALUES(estimated_future_pick_pack_fee_per_unit), estimated_future_weight_handling_fee_per_unit=VALUES(estimated_future_weight_handling_fee_per_unit), expected_future_fulfillment_fee_per_unit=VALUES(expected_future_fulfillment_fee_per_unit), has_local_inventory=VALUES(has_local_inventory), expected_efn_fulfilment_fee_per_unit_uk=VALUES(expected_efn_fulfilment_fee_per_unit_uk), expected_efn_fulfilment_fee_per_unit_de=VALUES(expected_efn_fulfilment_fee_per_unit_de), expected_efn_fulfilment_fee_per_unit_fr=VALUES(expected_efn_fulfilment_fee_per_unit_fr), expected_efn_fulfilment_fee_per_unit_it=VALUES(expected_efn_fulfilment_fee_per_unit_it), expected_efn_fulfilment_fee_per_unit_es=VALUES(expected_efn_fulfilment_fee_per_unit_es), user_id=VALUES(user_id), report_feed_data=VALUES(report_feed_data)";
+
+                        $check_fbah_estimated_fees_txt_data_sql_query = $this->db->query($fbah_estimated_fees_txt_data_sql_query);
+                        if (!$check_fbah_estimated_fees_txt_data_sql_query) {
+                            $getError = $this->db->error();
+                            $responseData['response'] = 2;
+                            $responseData['msg']      = $getError;
+                            $responseData['fileName'] = $report_file;
+                            $responseData['table_name'] = "fba_estimated_fees_txt_data_history";
+                            return $responseData;
+                            break;
+                        }
                         $fba_estimated_fees_txt_data_bulk_query_data = array();
                     }
                 }
@@ -2842,6 +2859,22 @@ public function process_fba_estimated_fees_txt_data($user_id,$report_file,$count
                     $responseData['response'] = 2;
                     $responseData['msg']      = $getError;
                     $responseData['fileName'] = $report_file;
+                    return $responseData;
+                }
+                $fbah_estimated_fees_txt_data_sql_query = "INSERT INTO `fba_estimated_fees_txt_data_history` (`sku`, `fnsku`, `asin`, `product_name`, `product_group`, `brand`, `fulfilled_by`, `your_price`, `sales_price`, `longest_side`, `median_side`, `shortest_side`, `length_and_girth`, `unit_of_dimension`, `item_package_weight`, `unit_of_weight`, `product_size_tier`, `currency`, `estimated_fee_total`, `estimated_referral_fee_per_unit`, `estimated_variable_closing_fee`, `estimated_order_handling_fee_per_order`, `estimated_pick_pack_fee_per_unit`, `estimated_weight_handling_fee_per_unit`, `expected_fulfillment_fee_per_unit`, `estimated_future_fee`, `estimated_future_order_handling_fee_per_order`, `estimated_future_pick_pack_fee_per_unit`, `estimated_future_weight_handling_fee_per_unit`, `expected_future_fulfillment_fee_per_unit`, `has_local_inventory`, `expected_efn_fulfilment_fee_per_unit_uk`, `expected_efn_fulfilment_fee_per_unit_de`, `expected_efn_fulfilment_fee_per_unit_fr`, `expected_efn_fulfilment_fee_per_unit_it`, `expected_efn_fulfilment_fee_per_unit_es`, `user_id`, `report_feed_data`)
+                                                 VALUES
+                                                 $fba_estimated_fees_txt_data_bulk_query_data_implode
+                                                 ON DUPLICATE KEY
+                                                 UPDATE
+                                                 sku=VALUES(sku), fnsku=VALUES(fnsku), asin=VALUES(asin), product_name=VALUES(product_name), product_group=VALUES(product_group), brand=VALUES(brand), fulfilled_by=VALUES(fulfilled_by), your_price=VALUES(your_price), sales_price=VALUES(sales_price), longest_side=VALUES(longest_side), median_side=VALUES(median_side), shortest_side=VALUES(shortest_side), length_and_girth=VALUES(length_and_girth), unit_of_dimension=VALUES(unit_of_dimension), item_package_weight=VALUES(item_package_weight), unit_of_weight=VALUES(unit_of_weight), product_size_tier=VALUES(product_size_tier), currency=VALUES(currency), estimated_fee_total=VALUES(estimated_fee_total), estimated_referral_fee_per_unit=VALUES(estimated_referral_fee_per_unit), estimated_variable_closing_fee=VALUES(estimated_variable_closing_fee), estimated_order_handling_fee_per_order=VALUES(estimated_order_handling_fee_per_order), estimated_pick_pack_fee_per_unit=VALUES(estimated_pick_pack_fee_per_unit), estimated_weight_handling_fee_per_unit=VALUES(estimated_weight_handling_fee_per_unit), expected_fulfillment_fee_per_unit=VALUES(expected_fulfillment_fee_per_unit), estimated_future_fee=VALUES(estimated_future_fee), estimated_future_order_handling_fee_per_order=VALUES(estimated_future_order_handling_fee_per_order), estimated_future_pick_pack_fee_per_unit=VALUES(estimated_future_pick_pack_fee_per_unit), estimated_future_weight_handling_fee_per_unit=VALUES(estimated_future_weight_handling_fee_per_unit), expected_future_fulfillment_fee_per_unit=VALUES(expected_future_fulfillment_fee_per_unit), has_local_inventory=VALUES(has_local_inventory), expected_efn_fulfilment_fee_per_unit_uk=VALUES(expected_efn_fulfilment_fee_per_unit_uk), expected_efn_fulfilment_fee_per_unit_de=VALUES(expected_efn_fulfilment_fee_per_unit_de), expected_efn_fulfilment_fee_per_unit_fr=VALUES(expected_efn_fulfilment_fee_per_unit_fr), expected_efn_fulfilment_fee_per_unit_it=VALUES(expected_efn_fulfilment_fee_per_unit_it), expected_efn_fulfilment_fee_per_unit_es=VALUES(expected_efn_fulfilment_fee_per_unit_es), user_id=VALUES(user_id), report_feed_data=VALUES(report_feed_data)";
+
+                $check_fbah_estimated_fees_txt_data_sql_query = $this->db->query($fbah_estimated_fees_txt_data_sql_query);
+                if (!$check_fbah_estimated_fees_txt_data_sql_query) {
+                    $getError = $this->db->error();
+                    $responseData['response'] = 2;
+                    $responseData['msg']      = $getError;
+                    $responseData['fileName'] = $report_file;
+                    $responseData['table_name'] = "fba_estimated_fees_txt_data_history";
                     return $responseData;
                 }
             }
